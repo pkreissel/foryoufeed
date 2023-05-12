@@ -10,9 +10,15 @@ import Feed from './pages/Feed';
 import { AuthProvider } from './hooks/useAuth';
 
 const App: React.FC = () => {
+  const getBasename = () => {
+    if (process.env.NODE_ENV === "production" && window.location.hostname.includes("github.io")) {
+      return "/foryoufeed";
+    }
+    return "";
+  };
   return (
 
-    <BrowserRouter>
+    <BrowserRouter basename={getBasename()}>
       <AuthProvider>
         <Container style={
           {
