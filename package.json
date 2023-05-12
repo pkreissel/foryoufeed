@@ -2,11 +2,13 @@
   "name": "foryoufeed",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://pkreissel.github.io/foryoufeed/",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "bootstrap": "^5.2.3",
+    "fedialgo": "github:pkreissel/fedialgo",
     "html-react-parser": "^3.0.15",
     "masto": "^5.11.1",
     "react": "^18.2.0",
@@ -20,7 +22,9 @@
   },
   "scripts": {
     "start": "webpack serve --mode development --open",
-    "build": "webpack --mode production"
+    "predeploy": "npm run build",
+    "build": "webpack --mode production",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
