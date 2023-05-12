@@ -24,7 +24,7 @@
     "start": "webpack serve --mode development --open",
     "predeploy": "npm run build",
     "build": "webpack --mode production",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d dist"
   },
   "eslintConfig": {
     "extends": [
