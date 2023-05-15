@@ -34,26 +34,23 @@ export default function StatusComponent(props: StatusComponentProps) {
     const reblog = async () => {
         //Reblog a post
         const status_ = await resolve(status);
-        weightAdjust(status.weights)
-
+        weightAdjust(status.scores)
         const id = status_.id;
         (async () => {
-            const res = await masto.v1.statuses.reblog(id);
-            console.log(res);
+            reblogged ? await masto.v1.statuses.unreblog(id) : await masto.v1.statuses.reblog(id);
             setReblogged(!reblogged)
         })();
     }
 
     const fav = async () => {
         //Favourite a post
-        console.log(status.weights)
+        console.log(status.scores)
 
         const status_ = await resolve(status);
-        weightAdjust(status.weights)
+        weightAdjust(status.scores)
         const id = status_.id;
         (async () => {
-            const res = await masto.v1.statuses.favourite(id);
-            console.log(res);
+            favourited ? await masto.v1.statuses.unfavourite(id) : await masto.v1.statuses.favourite(id);
             setFavourited(!favourited)
         })();
     }
@@ -62,7 +59,7 @@ export default function StatusComponent(props: StatusComponentProps) {
         //Follow a link to another instance on the homeserver
         e.preventDefault()
         const status_ = await resolve(status);
-        weightAdjust(status.weights)
+        weightAdjust(status.scores)
         console.log(status_)
         //new tab:
         window.location.href = props.user.server + "/@" + status_.account.acct + "/" + status_.id
@@ -70,7 +67,7 @@ export default function StatusComponent(props: StatusComponentProps) {
 
     const followLink = async () => {
         //Follow an article link
-        weightAdjust(status.weights)
+        weightAdjust(status.scores)
         window.location.href = status.card.url
     }
     return (

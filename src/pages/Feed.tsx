@@ -50,17 +50,23 @@ const Feed = () => {
     useEffect(() => {
         if (isBottom) {
             console.log("bottom")
-            if (records < feed.length) {
-                console.log("load more")
-                console.log(records)
-                setRecords(records + 10)
-            }
+            loadMore()
         }
     }, [isBottom])
 
+    const loadMore = () => {
+        if (records < feed.length) {
+            console.log("load more")
+            console.log(records)
+            setRecords(records + 10)
+        }
+    }
+
     //Adjust Weights
     const weightAdjust = async (weights: weightsType) => {
-        console.log("Adjusting Weights")
+        const newWeights = await algoObj.weightAdjust(weights)
+        console.log(newWeights)
+        setWeights(newWeights)
     }
 
     const updateWeights = async (newWeights: weightsType) => {
@@ -103,7 +109,7 @@ const Feed = () => {
                     />
                 )
             })}
-            <div ref={bottomRef}></div>
+            <div ref={bottomRef} onClick={loadMore}>Mehr Laden</div>
         </Container>
     )
 };

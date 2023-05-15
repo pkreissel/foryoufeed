@@ -6,7 +6,7 @@ export interface weightsType {
 
 export interface StatusType extends mastodon.v1.Status {
     topPost?: boolean;
-    weights?: weightsType;
+    scores?: weightsType;
     value?: number;
     reblog?: StatusType;
     reblogBy?: string;
