@@ -7,6 +7,7 @@ import Form from 'react-bootstrap/esm/Form';
 import Container from 'react-bootstrap/Container';
 import { useLocalStorage, AppStorage } from "../hooks/useLocalStorage";
 
+
 export default function LoginPage() {
     const [server, setServer] = React.useState<string>('');
     const [app, setApp] = useLocalStorage({ keyName: "app", defaultValue: {} } as AppStorage)

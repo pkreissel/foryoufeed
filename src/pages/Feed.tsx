@@ -54,8 +54,6 @@ const Feed = () => {
                 console.log("load more")
                 console.log(records)
                 setRecords(records + 10)
-            } else {
-                setRecords(feed.length)
             }
         }
     }, [isBottom])
