@@ -5,6 +5,8 @@ The interesting stuff is in the `src/pages/Feed.tsx` file.
 
 The bird UI of this app is based on the following repo: https://github.com/ronilaukkarinen/mastodon-bird-ui
 
+It is currently hosted here: https://foryoufeed.vercel.app
+
 ## Installation
 1. Clone this repo
 2. Install dependencies
