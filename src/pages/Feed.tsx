@@ -87,7 +87,7 @@ const Feed = () => {
                             return (
                                 <Form.Group className="mb-3">
                                     <Form.Label><b>{key + " - "}</b>{algoObj.getDescription(key) + ": " + weights[key]}</Form.Label>
-                                    <Form.Range min={0} max={weights[key] * 2} step={0.01} id={key} value={weights[key]} onChange={(e) => {
+                                    <Form.Range min={0} max={Math.max(...Object.values(weights)) + 1} step={0.01} id={key} value={weights[key]} onChange={(e) => {
                                         const newWeights = weights
                                         newWeights[key] = Number(e.target.value)
                                         updateWeights(newWeights)
