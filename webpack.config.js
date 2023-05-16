@@ -31,8 +31,9 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: "./src/index.html",
         }),
-        new WorkboxWebpackPlugin.InjectManifest({
-            swSrc: './src/service-worker.js',
+        new WorkboxWebpackPlugin.GenerateSW({
+            clientsClaim: true,
+            skipWaiting: true,
         }),
         new CopyPlugin({
             patterns: [
