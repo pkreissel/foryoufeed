@@ -63,8 +63,8 @@ const Feed = () => {
     }
 
     //Adjust Weights
-    const weightAdjust = async (weights: weightsType) => {
-        const newWeights = await algoObj.weightAdjust(weights)
+    const weightAdjust = async (scores: weightsType) => {
+        const newWeights = await algoObj.weightAdjust(scores)
         console.log(newWeights)
         setWeights(newWeights)
     }
