@@ -15,14 +15,15 @@ interface StatusComponentProps {
 
 export default function StatusComponent(props: StatusComponentProps) {
     const status = props.status.reblog ? props.status.reblog : props.status;
+    status.scores = props.status.scores;
     const [favourited, setFavourited] = React.useState<boolean>(status.favourited);
     const [reblogged, setReblogged] = React.useState<boolean>(status.reblogged);
     status.reblogBy = props.status.reblog ? props.status.account.displayName : props.status?.reblogBy;
     const masto = props.api;
     const weightAdjust = props.weightAdjust;
+
     const resolve = async (status: StatusType): Promise<StatusType> => {
         //Resolve Links to other instances on homeserver
-
         if (status.uri.includes(props.user.server)) {
             return status;
         } else {
