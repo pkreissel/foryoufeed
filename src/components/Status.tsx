@@ -152,7 +152,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                         )
                     }
                     <div className="status__action-bar">
-                        <button type="button" aria-label="Antworten" aria-hidden="false" title="Antworten" className="status__action-bar__button icon-button icon-button--with-counter" style={{ fontSize: "18px", width: "auto", height: "23.142857px", lineHeight: "18px" }} >
+                        <button onClick={followUri} type="button" aria-label="Antworten" aria-hidden="false" title="Antworten" className="status__action-bar__button icon-button icon-button--with-counter" style={{ fontSize: "18px", width: "auto", height: "23.142857px", lineHeight: "18px" }} >
                             <i className="fa fa-reply fa-fw" aria-hidden="true">
                             </i> <span className="icon-button__counter">
                                 <span className="animated-number">
@@ -180,7 +180,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                                 </span>
                             </span>
                         </button>
-                        <button type="button" aria-label="Teilen" aria-hidden="false" title="Teilen" className="status__action-bar__button icon-button" style={{ fontSize: "18px", width: "auto", height: "23.142857px", lineHeight: "18px" }} >
+                        <button onClick={followUri} type="button" aria-label="Teilen" aria-hidden="false" title="Teilen" className="status__action-bar__button icon-button" style={{ fontSize: "18px", width: "auto", height: "23.142857px", lineHeight: "18px" }} >
                             <i className="fa fa-share-alt fa-fw" aria-hidden="true">
                             </i>
                         </button>
