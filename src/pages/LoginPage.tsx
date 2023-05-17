@@ -13,15 +13,16 @@ export default function LoginPage() {
     const [app, setApp] = useLocalStorage({ keyName: "app", defaultValue: {} } as AppStorage)
 
     const loginRedirect = async (event: any): Promise<void> => {
+        const sanitized_server = server.replace("https://", "").replace("http://", "");
         const api = await login({
-            url: `https://${server}`,
+            url: `https://${sanitized_server}`,
         });
         const scope = "read:favourites read:follows read:search read:accounts read:statuses write:favourites write:statuses write:follows read:notifications"
         const app = await api.v1.apps.create({
             clientName: "Mastodon Demo",
             redirectUris: window.location.origin + "/callback",
             scopes: scope,
-            website: `https://${server}`,
+            website: `https://${sanitized_server}`,
         });
         console.log(app)
         setApp(app)
@@ -32,7 +33,7 @@ export default function LoginPage() {
             redirect_uri: window.location.origin + "/callback",
         })
 
-        window.location.href = `https://${server}/oauth/authorize?${query}`
+        window.location.href = `https://${sanitized_server}/oauth/authorize?${query}`
         return
     }
     return (
