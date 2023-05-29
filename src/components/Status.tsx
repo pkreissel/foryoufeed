@@ -35,7 +35,7 @@ export default function StatusComponent(props: StatusComponentProps) {
     const reblog = async () => {
         //Reblog a post
         const status_ = await resolve(status);
-        weightAdjust(status.scores)
+        reblogged ? console.log("skip") : weightAdjust(status.scores)
         const id = status_.id;
         (async () => {
             reblogged ? await masto.v1.statuses.unreblog(id) : await masto.v1.statuses.reblog(id);
@@ -48,7 +48,7 @@ export default function StatusComponent(props: StatusComponentProps) {
         console.log(status.scores)
 
         const status_ = await resolve(status);
-        weightAdjust(status.scores)
+        favourited ? console.log("skip") : weightAdjust(status.scores)
         const id = status_.id;
         (async () => {
             favourited ? await masto.v1.statuses.unfavourite(id) : await masto.v1.statuses.favourite(id);
