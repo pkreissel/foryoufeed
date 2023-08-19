@@ -7,6 +7,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "@vercel/analytics": "^1.0.2",
     "bootstrap": "^5.2.3",
     "fedialgo": "github:pkreissel/fedialgo",
     "html-react-parser": "^3.0.15",

@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage';
 import LogoutPage from './pages/LogoutPage';
 import Feed from './pages/Feed';
 import { AuthProvider } from './hooks/useAuth';
+import { inject } from '@vercel/analytics';
 
 const App: React.FC = () => {
   if ('serviceWorker' in navigator) {
@@ -21,6 +22,7 @@ const App: React.FC = () => {
     }
     return "";
   };
+  inject();
   return (
 
     <BrowserRouter basename={getBasename()}>
