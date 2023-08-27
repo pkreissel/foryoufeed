@@ -8,7 +8,7 @@ import { User } from '../types';
 
 interface StatusComponentProps {
     status: StatusType,
-    api: mastodon.Client,
+    api: mastodon.rest.Client,
     user: User,
     weightAdjust: (statusWeight: weightsType) => void
 }
@@ -27,7 +27,7 @@ export default function StatusComponent(props: StatusComponentProps) {
         if (status.uri.includes(props.user.server)) {
             return status;
         } else {
-            const res = await masto.v2.search({ q: status.uri, resolve: true })
+            const res = await masto.v2.search.fetch({ q: status.uri, resolve: true })
             return res.statuses[0]
         }
     }
@@ -38,7 +38,7 @@ export default function StatusComponent(props: StatusComponentProps) {
         reblogged ? console.log("skip") : weightAdjust(status.scores)
         const id = status_.id;
         (async () => {
-            reblogged ? await masto.v1.statuses.unreblog(id) : await masto.v1.statuses.reblog(id);
+            reblogged ? await masto.v1.statuses.$select(id).unreblog() : await masto.v1.statuses.$select(id).reblog();
             setReblogged(!reblogged)
         })();
     }
@@ -51,7 +51,7 @@ export default function StatusComponent(props: StatusComponentProps) {
         favourited ? console.log("skip") : weightAdjust(status.scores)
         const id = status_.id;
         (async () => {
-            favourited ? await masto.v1.statuses.unfavourite(id) : await masto.v1.statuses.favourite(id);
+            favourited ? await masto.v1.statuses.$select(id).unfavourite() : await masto.v1.statuses.$select(id).favourite();
             setFavourited(!favourited)
         })();
     }

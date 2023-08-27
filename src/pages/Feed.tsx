@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { StatusType, weightsType } from "../types";
 import { useAuth } from "../hooks/useAuth";
 import useOnScreen from "../hooks/useOnScreen";
-import { login, mastodon } from "masto";
+import { mastodon, createRestAPIClient } from "masto";
 import StatusComponent from "../components/Status";
 import Container from "react-bootstrap/esm/Container";
 import Accordion from "react-bootstrap/esm/Accordion";
@@ -14,7 +14,7 @@ import TheAlgorithm from "fedialgo"
 const Feed = () => {
     //Contruct Feed on Page Load
     const [feed, setFeed] = useState<StatusType[]>([]); //feed to display
-    const [api, setApi] = useState<mastodon.Client>(null); //save api object for later use
+    const [api, setApi] = useState<mastodon.rest.Client>(null); //save api object for later use
     const [error, setError] = useState<string>("");
     const [records, setRecords] = useState<number>(20); //how many records to show
     const [weights, setWeights] = useState<weightsType>({}); //weights for each category [category: weight
@@ -26,7 +26,7 @@ const Feed = () => {
     useEffect(() => {
         const constructFeed = async () => {
             if (user) {
-                const api: mastodon.Client = await login({
+                const api: mastodon.rest.Client = await createRestAPIClient({
                     url: user.server,
                     accessToken: user.access_token,
                 });
@@ -36,7 +36,7 @@ const Feed = () => {
                 // @ts-ignore
                 const algo = new TheAlgorithm(api, currUser)
                 setAlgo(algo)
-                const feed = await algo.getFeed()
+                const feed: StatusType[] = await algo.getFeed()
                 setWeights(await algo.getWeights())
                 if (isNaN(feed[0].value)) {
                     throw new Error("Feed Value is not a number")

@@ -1,6 +1,6 @@
 {
   "name": "foryoufeed",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "homepage": "https://pkreissel.github.io/foryoufeed/",
   "dependencies": {
@@ -11,13 +11,12 @@
     "bootstrap": "^5.2.3",
     "fedialgo": "github:pkreissel/fedialgo",
     "html-react-parser": "^3.0.15",
-    "masto": "^5.11.1",
+    "masto": "^6.0.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.4",
     "react-dom": "^18.2.0",
     "react-persistent-state": "^1.1.8",
     "react-router-dom": "^6.10.0",
-    "react-scripts": "5.0.1",
     "ufo": "^1.1.1",
     "web-vitals": "^2.1.4"
   },

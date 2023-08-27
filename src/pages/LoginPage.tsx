@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { login } from 'masto';
+import { createRestAPIClient } from 'masto';
 import { stringifyQuery } from 'ufo'
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/esm/Button';
@@ -14,7 +14,7 @@ export default function LoginPage() {
 
     const loginRedirect = async (event: any): Promise<void> => {
         const sanitized_server = server.replace("https://", "").replace("http://", "");
-        const api = await login({
+        const api = await createRestAPIClient({
             url: `https://${sanitized_server}`,
         });
         const scope = "read:favourites read:follows read:search read:accounts read:statuses write:favourites write:statuses write:follows read:notifications"

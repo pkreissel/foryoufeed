@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { login as loginMasto } from "masto"
+import { createRestAPIClient as loginMasto } from "masto"
 import { useLocalStorage, AppStorage } from '../hooks/useLocalStorage';
 import { useAuth } from '../hooks/useAuth';
 
