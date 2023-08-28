@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { StatusType, weightsType } from "../types";
 import { useAuth } from "../hooks/useAuth";
 import useOnScreen from "../hooks/useOnScreen";
-import { mastodon, createRestAPIClient } from "masto";
+import { mastodon, createRestAPIClient as loginMasto } from "masto";
 import StatusComponent from "../components/Status";
 import Container from "react-bootstrap/esm/Container";
 import Accordion from "react-bootstrap/esm/Accordion";
@@ -14,36 +14,16 @@ import TheAlgorithm from "fedialgo"
 const Feed = () => {
     //Contruct Feed on Page Load
     const [feed, setFeed] = useState<StatusType[]>([]); //feed to display
-    const [api, setApi] = useState<mastodon.rest.Client>(null); //save api object for later use
+    //const [_api, setApi] = useState<mastodon.rest.Client>(null); //save api object for later use
     const [error, setError] = useState<string>("");
     const [records, setRecords] = useState<number>(20); //how many records to show
     const [weights, setWeights] = useState<weightsType>({}); //weights for each category [category: weight
-    const [autoAdjust, setAutoAdjust] = usePersistentState<boolean>(true); //auto adjust weights
     const [algoObj, setAlgo] = useState<TheAlgorithm>(null); //algorithm to use 
     const { user } = useAuth();
     const bottomRef = useRef<HTMLDivElement>(null);
     const isBottom = useOnScreen(bottomRef)
+    let api: mastodon.rest.Client;
     useEffect(() => {
-        const constructFeed = async () => {
-            if (user) {
-                const api: mastodon.rest.Client = await createRestAPIClient({
-                    url: user.server,
-                    accessToken: user.access_token,
-                });
-                setApi(api);
-
-                const currUser = await api.v1.accounts.verifyCredentials()
-                // @ts-ignore
-                const algo = new TheAlgorithm(api, currUser)
-                setAlgo(algo)
-                const feed: StatusType[] = await algo.getFeed()
-                setWeights(await algo.getWeights())
-                if (isNaN(feed[0].value)) {
-                    throw new Error("Feed Value is not a number")
-                }
-                setFeed(feed)
-            }
-        };
         constructFeed();
     }, []);
 
@@ -53,6 +33,24 @@ const Feed = () => {
             loadMore()
         }
     }, [isBottom])
+
+    const constructFeed = async () => {
+        if (user) {
+            api = await loginMasto({
+                url: user.server,
+                accessToken: user.access_token,
+            });
+            let currUser: mastodon.v1.Account = await api.v1.accounts.verifyCredentials();
+            const algo = new TheAlgorithm(api, currUser)
+            setAlgo(algo)
+            const feed: StatusType[] = await algo.getFeed()
+            setWeights(await algo.getWeights())
+            if (isNaN(feed[0].value)) {
+                throw new Error("Feed Value is not a number")
+            }
+            setFeed(feed)
+        }
+    };
 
     const loadMore = () => {
         if (records < feed.length) {

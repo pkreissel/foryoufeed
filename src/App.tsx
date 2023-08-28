@@ -16,16 +16,10 @@ const App: React.FC = () => {
       navigator.serviceWorker.register('/service-worker.js');
     });
   }
-  const getBasename = () => {
-    if (process.env.NODE_ENV === "production" && window.location.hostname.includes("github.io")) {
-      return "/foryoufeed";
-    }
-    return "";
-  };
-  inject();
+  if (process.env.NODE_ENV === "production") inject();
   return (
 
-    <BrowserRouter basename={getBasename()}>
+    <BrowserRouter>
       <AuthProvider>
         <Container style={
           {
