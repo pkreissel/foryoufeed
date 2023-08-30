@@ -20,9 +20,12 @@ const Feed = () => {
     const [weights, setWeights] = useState<weightsType>({}); //weights for each category [category: weight
     const [algoObj, setAlgo] = useState<TheAlgorithm>(null); //algorithm to use 
     const { user } = useAuth();
+    const api = loginMasto({
+        url: user.server,
+        accessToken: user.access_token,
+    });
     const bottomRef = useRef<HTMLDivElement>(null);
     const isBottom = useOnScreen(bottomRef)
-    let api: mastodon.rest.Client;
     useEffect(() => {
         constructFeed();
     }, []);
@@ -36,19 +39,18 @@ const Feed = () => {
 
     const constructFeed = async () => {
         if (user) {
-            api = await loginMasto({
-                url: user.server,
-                accessToken: user.access_token,
-            });
             let currUser: mastodon.v1.Account = await api.v1.accounts.verifyCredentials();
             const algo = new TheAlgorithm(api, currUser)
-            setAlgo(algo)
+
             const feed: StatusType[] = await algo.getFeed()
-            setWeights(await algo.getWeights())
+
             if (isNaN(feed[0].value)) {
                 throw new Error("Feed Value is not a number")
             }
+
+            setWeights(await algo.getWeights())
             setFeed(feed)
+            setAlgo(algo)
         }
     };
 
@@ -96,7 +98,7 @@ const Feed = () => {
                     </Accordion.Body>
                 </Accordion.Item>
             </Accordion>
-            {(feed.length > 1) && feed.slice(0, Math.max(20, records)).map((status: any, index) => {
+            {api && (feed.length > 1) && feed.slice(0, Math.max(20, records)).map((status: any, index) => {
                 return (
                     <StatusComponent
                         status={status}
