@@ -113,7 +113,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                             </span>
                             <time dateTime={status.createdAt} title={status.createdAt}>{(new Date(status.createdAt)).toLocaleTimeString()}</time>
                         </a>
-                        <a href={props.user.server + "/" + status.account.acct} title={status.account.acct} className="status__display-name" target="_blank" rel="noopener noreferrer">
+                        <a href={props.user.server + "/@" + status.account.acct} title={status.account.acct} className="status__display-name" target="_blank" rel="noopener noreferrer">
                             <div className="status__avatar">
                                 <div className="account__avatar" style={{ width: "46px", height: "46px" }}>
                                     <img src={status.account.avatar} alt="{status.account.acct}" />
