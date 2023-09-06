@@ -4,11 +4,10 @@ import { useAuth } from "../hooks/useAuth";
 import useOnScreen from "../hooks/useOnScreen";
 import { mastodon, createRestAPIClient as loginMasto } from "masto";
 import StatusComponent from "../components/Status";
+import FullPageIsLoading from "../components/FullPageIsLoading";
 import Container from "react-bootstrap/esm/Container";
-import Accordion from "react-bootstrap/esm/Accordion";
-import Form from "react-bootstrap/esm/Form";
-import { usePersistentState } from 'react-persistent-state'
 import TheAlgorithm from "fedialgo"
+import WeightSetter from "../components/WeightSetter";
 
 
 const Feed = () => {
@@ -78,26 +77,8 @@ const Feed = () => {
     }
 
     return (
-        <Container style={{ maxWidth: "600px" }}>
-            <Accordion>
-                <Accordion.Item eventKey="0">
-                    <Accordion.Header>Feed Algorithmus</Accordion.Header>
-                    <Accordion.Body>
-                        {weights && Object.keys(weights).map((key) => {
-                            return (
-                                <Form.Group className="mb-3">
-                                    <Form.Label><b>{key + " - "}</b>{algoObj.getDescription(key) + ": " + weights[key]}</Form.Label>
-                                    <Form.Range min={0} max={Math.max(...Object.values(weights)) + 1} step={0.01} id={key} value={weights[key]} onChange={(e) => {
-                                        const newWeights = weights
-                                        newWeights[key] = Number(e.target.value)
-                                        updateWeights(newWeights)
-                                    }} />
-                                </Form.Group>
-                            )
-                        })}
-                    </Accordion.Body>
-                </Accordion.Item>
-            </Accordion>
+        <Container style={{ maxWidth: "600px", height: "auto" }}>
+            <WeightSetter weights={weights} updateWeights={updateWeights} algoObj={algoObj} />
             {api && (feed.length > 1) && feed.slice(0, Math.max(20, records)).map((status: any, index) => {
                 return (
                     <StatusComponent
@@ -109,7 +90,10 @@ const Feed = () => {
                     />
                 )
             })}
-            <div ref={bottomRef} onClick={loadMore}>Mehr Laden</div>
+            {feed.length < 1 &&
+                <FullPageIsLoading />
+            }
+            <div ref={bottomRef} onClick={loadMore}>Load More</div>
         </Container>
     )
 };
