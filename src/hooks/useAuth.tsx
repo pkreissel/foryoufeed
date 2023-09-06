@@ -22,14 +22,17 @@ export const AuthProvider = (props: PropsWithChildren) => {
         body.append("token", user.access_token);
         body.append("client_id", app.client_id);
         body.append("client_secret", app.client_secret);
-        fetch(user.server + '/oauth/revoke',
+        const res = await fetch(user.server + '/oauth/revoke',
             {
                 method: 'POST',
                 body: body
             }
         );
+        if (!res.ok) {
+            throw new Error("Logout Failed")
+        }
         setUser(null);
-        navigate("/login", { replace: true });
+        navigate("/", { replace: true });
     };
 
     const value = useMemo(

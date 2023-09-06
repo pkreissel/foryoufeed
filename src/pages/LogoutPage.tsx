@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { redirect } from 'react-router';
 
 
 const LogoutPage = () => {
-
     const { logout } = useAuth();
-    logout();
+    useEffect(() => {
+        logout()
+    }, [])
     return (
         <div>
-            <h1>Logged Out</h1>
+            <h1>Logging Out</h1>
         </div>
     )
 };
