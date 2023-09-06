@@ -38,29 +38,33 @@ export default function LoginPage() {
     }
     return (
         <>
-            <Container>
-                <Form.Group className="mb-3">
+            <div className='vh-100' style={{
+                flex: 1,
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: "center",
+                display: 'flex',
+            }}>
+                <div>
+                    <p style={{ lineHeight: 2, textAlign: "center" }}>
+                        Fedi-Feed features a customizable algorithm for sorting your feed.
+                        <br />
+                        You can choose which factors influence the sorting of your feed.
+                        <br />
+                        To get started:
+                        <br />
+                    </p>
+                </div>
+                <Form.Group className="mb-3 align-middle">
                     <Form.Label className="text-center w-100">Enter Mastodon Server in the form: https://example.social</Form.Label >
                     <Form.Control type="url" id="mastodon_server" placeholder="https://mastodon.social" onChange={(e) => {
                         setServer(e.target.value);
                     }} />
                 </Form.Group>
-            </Container>
-
-            <Button onClick={loginRedirect}>Login</Button>
-            <Card
-                bg={"danger"}
-                text={"white"}
-                style={{ width: '18rem', marginTop: '100px' }}
-                className="mb-2"
-            >
-                <Card.Header>Attention</Card.Header>
-                <Card.Body>
-                    <Card.Text>
-                        This is a demo application. It might contain security issues. Please use at your own risk.
-                    </Card.Text>
-                </Card.Body>
-            </Card>
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                    <Button onClick={loginRedirect}>Login</Button>
+                </div>
+            </div>
         </>
     )
 }
