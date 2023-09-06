@@ -2,6 +2,7 @@ import React from 'react';
 import "../birdUI.css";
 import "../default.css";
 import { StatusType, weightsType } from '../types';
+import Modal from 'react-bootstrap/Modal';
 import parse from 'html-react-parser'
 import { mastodon } from 'masto';
 import { User } from '../types';
@@ -18,8 +19,10 @@ export default function StatusComponent(props: StatusComponentProps) {
     status.scores = props.status.scores;
     const [favourited, setFavourited] = React.useState<boolean>(status.favourited);
     const [reblogged, setReblogged] = React.useState<boolean>(status.reblogged);
+    const [imageModal, setImageModal] = React.useState<boolean>(false);
     status.reblogBy = props.status.reblog ? props.status.account.displayName : props.status?.reblogBy;
     const masto = props.api;
+    if (!masto) throw new Error("No Mastodon API");
     const weightAdjust = props.weightAdjust;
 
     const resolve = async (status: StatusType): Promise<StatusType> => {
@@ -66,13 +69,22 @@ export default function StatusComponent(props: StatusComponentProps) {
         window.location.href = props.user.server + "/@" + status_.account.acct + "/" + status_.id
     }
 
-    const followLink = async () => {
-        //Follow an article link
-        weightAdjust(status.scores)
-        window.location.href = status.card.url
-    }
     return (
         <div>
+            {
+                status.mediaAttachments.length > 0 && status.mediaAttachments[0].type === "image" && (
+                    <Modal show={imageModal} onHide={() => setImageModal(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>{parse(status.content)[100]}</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <img width={"100%"} src={status.mediaAttachments[0].url} alt={status.mediaAttachments[0].description ?? ""} />
+                        </Modal.Body>
+                    </Modal>
+                )
+            }
+
+
             <div className="status__wrapper status__wrapper-public focusable" aria-label={`${status.account.displayName}, ${status.account.note} ${status.account.acct}`}>
                 {status.reblogBy &&
                     <div className="status__prepend">
@@ -89,7 +101,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                 }
                 <div className="status status-public" data-id="110208921130165916">
                     <div className="status__info">
-                        <a href={props.user.server + status.account.acct} onClick={followUri} className="status__relative-time" target="_blank" rel="noopener noreferrer">
+                        <a onClick={followUri} className="status__relative-time" target="_blank" rel="noopener noreferrer">
                             <span className="status__visibility-icon">
                                 <i className="fa fa-globe" title="Öffentlich">
                                 </i>
@@ -101,7 +113,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                             </span>
                             <time dateTime={status.createdAt} title={status.createdAt}>{(new Date(status.createdAt)).toLocaleTimeString()}</time>
                         </a>
-                        <a href={props.user.server + status.account.acct} title={status.account.acct} className="status__display-name" target="_blank" rel="noopener noreferrer">
+                        <a href={props.user.server + "/" + status.account.acct} title={status.account.acct} className="status__display-name" target="_blank" rel="noopener noreferrer">
                             <div className="status__avatar">
                                 <div className="account__avatar" style={{ width: "46px", height: "46px" }}>
                                     <img src={status.account.avatar} alt="{status.account.acct}" />
@@ -123,7 +135,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                         </div>
                     </div>
                     {status.card && (
-                        <a href={status.card.url} onClick={followLink} className="status-card compact" target="_blank" rel="noopener noreferrer">
+                        <a href={status.card.url} onClick={() => weightAdjust(status.scores)} className="status-card compact" target="_blank" rel="noopener noreferrer">
                             <div className="status-card__image">
                                 <canvas className="status-card__image-preview status-card__image-preview--hidden" width="32" height="32"></canvas>
                                 <img src={status.card.image} alt="" className="status-card__image-image" />
@@ -138,17 +150,12 @@ export default function StatusComponent(props: StatusComponentProps) {
                     {!status.card &&
                         status.mediaAttachments.filter(att => att.type === "image").length > 0 && (
                             <div className="media-gallery" style={{ height: "314.4375px" }}>
-                                <div className="spoiler-button spoiler-button--minified">
-                                    <button type="button" aria-label="Medium ausblenden" aria-hidden="true" title="Medium ausblenden" className="icon-button overlayed" style={{ fontSize: "18px", width: "23.142857px", height: "23.142857px", lineHeight: "18px" }}>
-                                        <i className="fa fa-eye-slash fa-fw" aria-hidden="true">
-                                        </i>
-                                    </button>
-                                </div>
-                                <div className="media-gallery__item" style={{ inset: "auto", width: "100%", height: "100%" }}><canvas className="media-gallery__preview media-gallery__preview--hidden" width="32" height="32" />
-                                    <a className="media-gallery__item-thumbnail" href={status.mediaAttachments[0].url} target="_blank" rel="noopener noreferrer">
-                                        <img src={status.mediaAttachments[0].url} sizes="559px" alt={status.mediaAttachments[0].description} style={{ objectPosition: "50%" }} />
-                                    </a>
-                                </div>
+                                {status.mediaAttachments.filter(att => att.type === "image").map(att => (
+                                    <div className="media-gallery__item" style={{ inset: "auto", width: "100%", height: "100%" }}>
+                                        <canvas className="media-gallery__preview media-gallery__preview--hidden" width="32" height="32" />
+                                        <img src={att.url} onClick={() => setImageModal(true)} sizes="559px" alt={att.description} style={{ objectPosition: "50%", width: "100%" }} />
+                                    </div>
+                                ))}
                             </div>
                         )
                     }
