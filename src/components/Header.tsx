@@ -13,7 +13,7 @@ const Header = () => {
                 {
                     user && <div className='text-center d-inline align-middle'>
                         {user?.profilePicture && <img src={user.profilePicture} alt="Avatar" style={{ height: 30, width: 30, borderRadius: 5 }} className="d-inline-block align-top" />}
-                        <span style={{ fontSize: 15, padding: 10 }}>Logged in as  {user.username}</span>
+                        <span style={{ fontSize: 15, padding: 10 }}>{user.username}</span>
                     </div>
                 }
             </Col>
