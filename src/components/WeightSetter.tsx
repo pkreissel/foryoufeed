@@ -15,7 +15,7 @@ const WeightSetter = ({ weights, updateWeights, algoObj }: { weights: weightsTyp
                             <Form.Label><b>{key + " - "}</b>{algoObj.getDescription(key) + ": " + weights[key].toFixed(2)}</Form.Label>
                             <Form.Range
                                 min={0}
-                                max={Math.max(...Object.values(weights)) * 1.5}
+                                max={Math.max(...Object.values(weights)) + 1 * 1.2}
                                 step={0.01}
                                 id={key}
                                 value={weights[key]}
