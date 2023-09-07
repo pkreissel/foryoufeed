@@ -17,8 +17,9 @@ const Header = () => {
                     </div>
                 }
             </Col>
-            <Col xs={6}>
-                <h1 className='text-center' style={{ fontSize: 20 }}>Fedi-Feed</h1>
+            <Col xs={6} className='text-center'>
+                <img src={"/assets/logo.png"} style={{ height: 20, width: 20, borderRadius: 5 }} className="d-inline-block align-top" />
+                <span className='text-center align-middle p-2' style={{ fontSize: 20 }}>Fedi-Feed</span>
             </Col>
 
             <Col className='text-end'>

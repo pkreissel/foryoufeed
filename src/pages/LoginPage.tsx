@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { createRestAPIClient } from 'masto';
 import { stringifyQuery } from 'ufo'
-import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/esm/Button';
 import Form from 'react-bootstrap/esm/Form';
-import Container from 'react-bootstrap/Container';
 import { useLocalStorage, AppStorage } from "../hooks/useLocalStorage";
-
 
 export default function LoginPage() {
     const [server, setServer] = React.useState<string>('');
@@ -45,6 +42,7 @@ export default function LoginPage() {
                 justifyContent: "center",
                 display: 'flex',
             }}>
+                <img src={"/assets/Showcase.png"} style={{ maxHeight: "40%" }} />
                 <div>
                     <p style={{ lineHeight: 2, textAlign: "center" }}>
                         Fedi-Feed features a customizable algorithm for sorting your feed.
