@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { StatusType, weightsType } from "../types";
+import { StatusType, settingsType, weightsType } from "../types";
 import { useAuth } from "../hooks/useAuth";
 import useOnScreen from "../hooks/useOnScreen";
 import { mastodon, createRestAPIClient as loginMasto } from "masto";
@@ -8,6 +8,7 @@ import FullPageIsLoading from "../components/FullPageIsLoading";
 import Container from "react-bootstrap/esm/Container";
 import TheAlgorithm from "fedialgo"
 import WeightSetter from "../components/WeightSetter";
+import { usePersistentState } from "react-persistent-state";
 
 
 const Feed = () => {
@@ -16,7 +17,11 @@ const Feed = () => {
     //const [_api, setApi] = useState<mastodon.rest.Client>(null); //save api object for later use
     const [error, setError] = useState<string>("");
     const [records, setRecords] = useState<number>(20); //how many records to show
-    const [weights, setWeights] = useState<weightsType>({}); //weights for each category [category: weight
+    const [weights, setWeights] = useState<weightsType>({}); //weights for each factor
+    const [settings, setSettings] = usePersistentState<settingsType>({
+        "reposts": true,
+        "onlyLinks": false,
+    }, "settings"); //settings for feed
     const [algoObj, setAlgo] = useState<TheAlgorithm>(null); //algorithm to use 
     const { user, logout } = useAuth();
     const api = loginMasto({
@@ -83,10 +88,33 @@ const Feed = () => {
         }
     }
 
+    const updateSettings = async (newSettings: settingsType) => {
+        console.log(newSettings)
+        setSettings(newSettings)
+        setFeed([...feed])
+    }
+
+
+
     return (
         <Container style={{ maxWidth: "600px", height: "auto" }}>
-            <WeightSetter weights={weights} updateWeights={updateWeights} algoObj={algoObj} />
-            {api && (feed.length > 1) && feed.slice(0, Math.max(20, records)).map((status: any, index) => {
+            <WeightSetter
+                weights={weights}
+                updateWeights={updateWeights}
+                algoObj={algoObj}
+                settings={settings}
+                updateSettings={updateSettings}
+            />
+            {api && (feed.length > 1) && feed.filter((status: StatusType) => {
+                let pass = true
+                if (settings.onlyLinks) {
+                    pass = !(status.card == null && status?.reblog?.card == null)
+                }
+                if (!settings.reposts) {
+                    pass = pass && (status.reblog == null)
+                }
+                return pass
+            }).slice(0, Math.max(20, records)).map((status: any, index) => {
                 return (
                     <StatusComponent
                         status={status}

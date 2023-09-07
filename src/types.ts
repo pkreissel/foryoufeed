@@ -4,6 +4,10 @@ export interface weightsType {
     [key: string]: number; // Replace 'any' with the desired value type (e.g., string, number, etc.)
 }
 
+export interface settingsType {
+    [key: string]: boolean; // Replace 'any' with the desired value type (e.g., string, number, etc.)
+}
+
 export interface StatusType extends mastodon.v1.Status {
     topPost?: boolean;
     scores?: weightsType;
