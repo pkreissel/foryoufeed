@@ -38,6 +38,7 @@ module.exports = {
         new CopyPlugin({
             patterns: [
                 { from: 'assets', to: '' }, // copies all files from assets to dist/
+                { from: 'public', to: '' }, // copies all files from public to dist/
             ],
         }),
     ],
