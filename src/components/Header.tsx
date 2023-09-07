@@ -9,7 +9,7 @@ const Header = () => {
     const { user } = useAuth();
     return (
         <Row className='w-100'>
-            <Col>
+            <Col xs={4}>
                 {
                     user && <div className='text-center d-inline align-middle'>
                         {user?.profilePicture && <img src={user.profilePicture} alt="Avatar" style={{ height: 30, width: 30, borderRadius: 5 }} className="d-inline-block align-top" />}
@@ -17,7 +17,7 @@ const Header = () => {
                     </div>
                 }
             </Col>
-            <Col xs={6} className='text-center'>
+            <Col xs={4} className='text-center'>
                 <img src={"/assets/logo.png"} style={{ height: 20, width: 20, borderRadius: 5 }} className="d-inline-block align-top" />
                 <span className='text-center align-middle p-2' style={{ fontSize: 20 }}>Fedi-Feed</span>
             </Col>
