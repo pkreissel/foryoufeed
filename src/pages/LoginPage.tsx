@@ -3,10 +3,11 @@ import { createRestAPIClient } from 'masto';
 import { stringifyQuery } from 'ufo'
 import Button from 'react-bootstrap/esm/Button';
 import Form from 'react-bootstrap/esm/Form';
+import { usePersistentState } from "react-persistent-state"
 import { useLocalStorage, AppStorage } from "../hooks/useLocalStorage";
 
 export default function LoginPage() {
-    const [server, setServer] = React.useState<string>('');
+    const [server, setServer, clearServer] = usePersistentState<string>("", "server");
     const [app, setApp] = useLocalStorage({ keyName: "app", defaultValue: {} } as AppStorage)
 
     const loginRedirect = async (event: any): Promise<void> => {
@@ -57,7 +58,7 @@ export default function LoginPage() {
                     <Form.Label className="text-center w-100">Enter Mastodon Server in the form: https://example.social</Form.Label >
                     <Form.Control type="url" id="mastodon_server" placeholder="https://mastodon.social" onChange={(e) => {
                         setServer(e.target.value);
-                    }} />
+                    }} value={server} />
                 </Form.Group>
                 <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
                     <Button onClick={loginRedirect}>Login</Button>

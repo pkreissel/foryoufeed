@@ -8,7 +8,6 @@ import FullPageIsLoading from "../components/FullPageIsLoading";
 import Container from "react-bootstrap/esm/Container";
 import TheAlgorithm from "fedialgo"
 import WeightSetter from "../components/WeightSetter";
-import { redirect } from "react-router";
 
 
 const Feed = () => {
