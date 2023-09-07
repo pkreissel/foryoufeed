@@ -16,7 +16,7 @@ export default function LoginPage() {
         });
         const scope = "read:favourites read:follows read:search read:accounts read:statuses write:favourites write:statuses write:follows read:notifications"
         const app = await api.v1.apps.create({
-            clientName: "Mastodon Demo",
+            clientName: "ForYouFeed",
             redirectUris: window.location.origin + "/callback",
             scopes: scope,
             website: `https://${sanitized_server}`,
