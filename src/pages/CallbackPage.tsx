@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { createRestAPIClient as loginMasto } from "masto"
 import { useLocalStorage, AppStorage } from '../hooks/useLocalStorage';
 import { useAuth } from '../hooks/useAuth';
+import { User } from '../types';
 
 export default function CallbackPage() {
     const [error, setError] = React.useState("");
@@ -39,13 +40,13 @@ export default function CallbackPage() {
             accessToken: json["access_token"],
         })
         api.v1.accounts.verifyCredentials().then((user) => {
-            const userData = {
+            const userData: User = {
                 id: user.id,
                 username: user.username,
+                profilePicture: user.avatar,
                 access_token: json["access_token"],
                 server: app.website,
             }
-            console.log("Success")
             loginUser(userData).then(() => {
                 console.log("Logged in!")
             })

@@ -21,8 +21,9 @@ export type App = {
 }
 
 export type User = {
-    accessToken: string;
+    access_token: string;
     id: string;
+    profilePicture?: string;
     username: string;
     server: string;
 }
