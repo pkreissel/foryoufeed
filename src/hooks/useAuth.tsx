@@ -2,6 +2,7 @@ import React, { PropsWithChildren } from "react";
 import { createContext, useContext, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocalStorage, UserStorage, AppStorage } from "./useLocalStorage";
+import { User } from "../types";
 const AuthContext = createContext({ user: null, loginUser: async (data: any) => { }, logout: () => { } });
 
 export const AuthProvider = (props: PropsWithChildren) => {
@@ -10,9 +11,9 @@ export const AuthProvider = (props: PropsWithChildren) => {
     const navigate = useNavigate();
 
     // call this function when you want to authenticate the user
-    const loginUser = async (data: UserStorage["defaultValue"]) => {
+    const loginUser = async (user: User) => {
         console.log("logged in")
-        setUser(data);
+        setUser(user);
         navigate("/");
     };
 
@@ -22,17 +23,18 @@ export const AuthProvider = (props: PropsWithChildren) => {
         body.append("token", user.access_token);
         body.append("client_id", app.client_id);
         body.append("client_secret", app.client_secret);
-        const res = await fetch(user.server + '/oauth/revoke',
-            {
-                method: 'POST',
-                body: body
-            }
-        );
-        if (!res.ok) {
-            throw new Error("Logout Failed")
+        try {
+            await fetch(user.server + '/oauth/revoke',
+                {
+                    method: 'POST',
+                    body: body,
+                }
+            );
+        } catch (error) {
+            console.log(error)
         }
         setUser(null);
-        navigate("/", { replace: true });
+        navigate("/login", { replace: true });
     };
 
     const value = useMemo(

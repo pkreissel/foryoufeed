@@ -138,7 +138,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                         <a href={status.card.url} onClick={() => weightAdjust(status.scores)} className="status-card compact" target="_blank" rel="noopener noreferrer">
                             <div className="status-card__image">
                                 <canvas className="status-card__image-preview status-card__image-preview--hidden" width="32" height="32"></canvas>
-                                <img src={status.card.image} alt="" className="status-card__image-image" />
+                                <img style={{ maxHeight: "30vh" }} src={status.card.image} alt="" className="status-card__image-image" />
                             </div>
                             <div className='status-card__content'>
                                 <span className='status-card__host'>{status.card.providerName}</span>

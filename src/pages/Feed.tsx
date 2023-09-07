@@ -8,6 +8,7 @@ import FullPageIsLoading from "../components/FullPageIsLoading";
 import Container from "react-bootstrap/esm/Container";
 import TheAlgorithm from "fedialgo"
 import WeightSetter from "../components/WeightSetter";
+import { redirect } from "react-router";
 
 
 const Feed = () => {
@@ -18,7 +19,7 @@ const Feed = () => {
     const [records, setRecords] = useState<number>(20); //how many records to show
     const [weights, setWeights] = useState<weightsType>({}); //weights for each category [category: weight
     const [algoObj, setAlgo] = useState<TheAlgorithm>(null); //algorithm to use 
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const api = loginMasto({
         url: user.server,
         accessToken: user.access_token,
@@ -37,8 +38,15 @@ const Feed = () => {
     }, [isBottom])
 
     const constructFeed = async () => {
+
         if (user) {
-            let currUser: mastodon.v1.Account = await api.v1.accounts.verifyCredentials();
+            let currUser: mastodon.v1.Account
+            try {
+                currUser = await api.v1.accounts.verifyCredentials();
+            } catch (error) {
+                console.log(error)
+                logout()
+            }
             const algo = new TheAlgorithm(api, currUser)
 
             const feed: StatusType[] = await algo.getFeed()
