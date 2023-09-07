@@ -12,7 +12,7 @@ const WeightSetter = ({ weights, updateWeights, algoObj }: { weights: weightsTyp
                 {weights && Object.keys(weights).map((key) => {
                     return (
                         <Form.Group className="mb-3">
-                            <Form.Label><b>{key + " - "}</b>{algoObj.getDescription(key) + ": " + weights[key].toFixed(2)}</Form.Label>
+                            <Form.Label><b>{key + " - "}</b>{algoObj.getDescription(key) + ": " + weights[key]?.toFixed(2)}</Form.Label>
                             <Form.Range
                                 min={0}
                                 max={Math.max(...Object.values(weights)) + 1 * 1.2}
