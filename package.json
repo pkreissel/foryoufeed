@@ -21,7 +21,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "webpack serve --mode development --open",
+    "start": "webpack serve --mode development --open --no-cache",
     "predeploy": "npm run build",
     "build": "webpack --mode production",
     "test": "jest"
