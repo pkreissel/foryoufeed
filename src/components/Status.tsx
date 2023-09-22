@@ -143,7 +143,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                             <div className='status-card__content'>
                                 <span className='status-card__host'>{status.card.providerName}</span>
                                 {status.card.title}
-                                {<p className='status-card__description'>{status.card.description.replace(/(.{200})..+/, "$1…")}</p>}
+                                {<p className='status-card__description'>{status.card.description.slice(0, 200)}</p>}
                             </div>
                         </a>
                     )}

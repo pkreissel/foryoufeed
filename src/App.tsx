@@ -28,8 +28,7 @@ const App: React.FC = () => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            height: '100vh',
-            paddingTop: "20px"
+            height: '100vh'
           }
         } className='container-fluid'>
           <Header />

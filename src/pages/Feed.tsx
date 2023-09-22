@@ -42,7 +42,6 @@ const Feed = () => {
     }, [isBottom])
 
     const constructFeed = async () => {
-
         if (user) {
             let currUser: mastodon.v1.Account
             try {
@@ -54,7 +53,7 @@ const Feed = () => {
             const algo = new TheAlgorithm(api, currUser)
 
             const feed: StatusType[] = await algo.getFeed()
-
+            console.log(feed)
             if (isNaN(feed[0].value)) {
                 throw new Error("Feed Value is not a number")
             }

@@ -8,7 +8,7 @@ import Col from 'react-bootstrap/esm/Col';
 const Header = () => {
     const { user } = useAuth();
     return (
-        <Row className='w-100'>
+        <Row className='w-100 m-3'>
             <Col xs={4} className="p-0">
                 {
                     user && <div className='text-center d-inline align-middle'>
