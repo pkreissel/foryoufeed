@@ -6,12 +6,14 @@ import Modal from 'react-bootstrap/Modal';
 import parse from 'html-react-parser'
 import { mastodon } from 'masto';
 import { User } from '../types';
+import Toast from 'react-bootstrap/Toast';
 
 interface StatusComponentProps {
     status: StatusType,
     api: mastodon.rest.Client,
     user: User,
     weightAdjust: (statusWeight: weightsType) => void
+    setError: (error: string) => void
 }
 
 export default function StatusComponent(props: StatusComponentProps) {
@@ -20,13 +22,14 @@ export default function StatusComponent(props: StatusComponentProps) {
     const [favourited, setFavourited] = React.useState<boolean>(status.favourited);
     const [reblogged, setReblogged] = React.useState<boolean>(status.reblogged);
     const [imageModal, setImageModal] = React.useState<boolean>(false);
+    const [scoreModal, setScoreModal] = React.useState<boolean>(false);
+    const [error, setError] = React.useState<string>("");
     status.reblogBy = props.status.reblog ? props.status.account.displayName : props.status?.reblogBy;
     const masto = props.api;
     if (!masto) throw new Error("No Mastodon API");
     const weightAdjust = props.weightAdjust;
 
     const resolve = async (status: StatusType): Promise<StatusType> => {
-        //Resolve Links to other instances on homeserver
         if (status.uri.includes(props.user.server)) {
             return status;
         } else {
@@ -69,6 +72,12 @@ export default function StatusComponent(props: StatusComponentProps) {
         window.location.href = props.user.server + "/@" + status_.account.acct + "/" + status_.id
     }
 
+    const showScore = async () => {
+        //Show the score of a post
+        setScoreModal(true)
+    }
+
+
     return (
         <div>
             {
@@ -83,6 +92,27 @@ export default function StatusComponent(props: StatusComponentProps) {
                     </Modal>
                 )
             }
+            {
+                <Modal show={scoreModal} onHide={() => setScoreModal(false)} style={{ color: "black" }}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Score</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p>Score: {status.value}</p>
+                        <p>Weights: {
+                            Object.keys(status.scores).map(key => (
+                                <p>{key}: {status.scores[key]}</p>
+                            ))
+                        }</p>
+                    </Modal.Body>
+                </Modal>
+            }
+            <Toast show={Boolean(error)} delay={3000} autohide>
+                <Toast.Header>
+                    <strong className="me-auto">Error</strong>
+                </Toast.Header>
+                <Toast.Body>{error}</Toast.Body>
+            </Toast>
 
 
             <div className="status__wrapper status__wrapper-public focusable" aria-label={`${status.account.displayName}, ${status.account.note} ${status.account.acct}`}>
@@ -101,12 +131,16 @@ export default function StatusComponent(props: StatusComponentProps) {
                 }
                 <div className="status status-public" data-id="110208921130165916">
                     <div className="status__info">
-                        <a onClick={followUri} className="status__relative-time" target="_blank" rel="noopener noreferrer">
+                        <a href={status.uri} className="status__relative-time" target="_blank" rel="noopener noreferrer">
                             <span className="status__visibility-icon">
                                 <i className="fa fa-globe" title="Öffentlich">
                                 </i>
                                 {status?.topPost && (
-                                    <i className="fa fa-fire" title="Privat">
+                                    <i className="fa fa-fire" title="Top Post">
+                                    </i>
+                                )}
+                                {status?.recommended && (
+                                    <i className="fa fa-bolt" title="Empfohlen">
                                     </i>
                                 )}
 
@@ -180,13 +214,19 @@ export default function StatusComponent(props: StatusComponentProps) {
                         </button>
                         <button onClick={fav} type="button" aria-label="Favorisieren" aria-hidden="false" title="Favorisieren" className={("status__action-bar__button star-icon icon-button icon-button--with-counter" + (favourited ? " active activate" : " deactivate"))} style={{ fontSize: "18px", width: "auto", height: "23.142857px", lineHeight: "18px" }} >
                             <i className="fa fa-star fa-fw" aria-hidden="true">
-                            </i> <span className="icon-button__counter">
+                            </i>
+                            <span className="icon-button__counter">
                                 <span className="animated-number">
                                     <span style={{ position: "static" }}>
                                         <span>{status.favouritesCount}</span>
                                     </span>
                                 </span>
                             </span>
+                        </button>
+                        <button onClick={showScore} type="button" aria-label="Score" aria-hidden="false" title="Score" className="status__action-bar__button icon-button" style={{ fontSize: "18px", width: "20px", height: "23.142857px", lineHeight: "18px" }} >
+                            <i className="fa fa-pie-chart fa-fw" title="Empfohlen">
+                                i
+                            </i>
                         </button>
                         <button onClick={followUri} type="button" aria-label="Teilen" aria-hidden="false" title="Teilen" className="status__action-bar__button icon-button" style={{ fontSize: "18px", width: "auto", height: "23.142857px", lineHeight: "18px" }} >
                             <i className="fa fa-share-alt fa-fw" aria-hidden="true">

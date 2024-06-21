@@ -5,6 +5,7 @@ import { redirect } from 'react-router';
 
 const LogoutPage = () => {
     const { logout } = useAuth();
+
     useEffect(() => {
         logout()
     }, [])

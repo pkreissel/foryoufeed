@@ -10,6 +10,7 @@ export interface settingsType {
 
 export interface StatusType extends mastodon.v1.Status {
     topPost?: boolean;
+    recommended?: boolean;
     scores?: weightsType;
     value?: number;
     reblog?: StatusType;
