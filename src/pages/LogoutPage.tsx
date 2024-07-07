@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { redirect } from 'react-router';
 
 
 const LogoutPage = () => {

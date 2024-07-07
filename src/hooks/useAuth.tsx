@@ -1,13 +1,13 @@
 import React, { PropsWithChildren } from "react";
 import { createContext, useContext, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLocalStorage, UserStorage, AppStorage } from "./useLocalStorage";
+import { useAppStorage, useUserStorage } from "./useLocalStorage";
 import { User } from "../types";
-const AuthContext = createContext({ user: null, loginUser: async (data: any) => { }, logout: () => { } });
+const AuthContext = createContext({ user: null, loginUser: async (_user: User) => { }, logout: () => { } });
 
 export const AuthProvider = (props: PropsWithChildren) => {
-    const [user, setUser] = useLocalStorage({ keyName: "user", defaultValue: null } as UserStorage)
-    const [app, setApp] = useLocalStorage({ keyName: "app", defaultValue: {} } as AppStorage)
+    const [user, setUser] = useUserStorage({ keyName: "user", defaultValue: null })
+    const [app, _setApp] = useAppStorage({ keyName: "app", defaultValue: null })
     const navigate = useNavigate();
 
     // call this function when you want to authenticate the user
@@ -21,8 +21,8 @@ export const AuthProvider = (props: PropsWithChildren) => {
     const logout = async () => {
         const body = new FormData();
         body.append("token", user.access_token);
-        body.append("client_id", app.client_id);
-        body.append("client_secret", app.client_secret);
+        body.append("client_id", app.clientId)
+        body.append("client_secret", app.clientSecret);
         try {
             await fetch(user.server + '/oauth/revoke',
                 {

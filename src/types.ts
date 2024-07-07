@@ -17,12 +17,9 @@ export interface StatusType extends mastodon.v1.Status {
     reblogBy?: string;
 }
 
-
-export type App = {
-    clientId: string;
-    clientSecret: string;
+export interface App extends mastodon.v1.Client {
     redirectUri: string;
-    website: string;
+    [key: string]: unknown;
 }
 
 export type User = {

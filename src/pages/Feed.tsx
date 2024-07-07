@@ -9,6 +9,7 @@ import Container from "react-bootstrap/esm/Container";
 import TheAlgorithm from "fedialgo"
 import WeightSetter from "../components/WeightSetter";
 import { usePersistentState } from "react-persistent-state";
+import { Modal } from "react-bootstrap";
 
 
 const Feed = () => {
@@ -124,6 +125,12 @@ const Feed = () => {
 
     return (
         <Container style={{ maxWidth: "600px", height: "auto" }}>
+            <Modal show={error !== ""} onHide={() => setError("")}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Error</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>{error}</Modal.Body>
+            </Modal>
             <WeightSetter
                 weights={weights}
                 updateWeights={updateWeights}
@@ -140,7 +147,7 @@ const Feed = () => {
                     pass = pass && (status.reblog == null)
                 }
                 return pass
-            }).slice(0, Math.max(20, records)).map((status: any, index) => {
+            }).slice(0, Math.max(20, records)).map((status: StatusType) => {
                 return (
                     <StatusComponent
                         status={status}

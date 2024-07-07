@@ -21,13 +21,30 @@ export default function StatusComponent(props: StatusComponentProps) {
     status.scores = props.status.scores;
     const [favourited, setFavourited] = React.useState<boolean>(status.favourited);
     const [reblogged, setReblogged] = React.useState<boolean>(status.reblogged);
-    const [imageModal, setImageModal] = React.useState<boolean>(false);
+    const [attModal, setAttModal] = React.useState<number>(-1); //index of the attachment to show
     const [scoreModal, setScoreModal] = React.useState<boolean>(false);
-    const [error, setError] = React.useState<string>("");
+    const [error, _setError] = React.useState<string>("");
     status.reblogBy = props.status.reblog ? props.status.account.displayName : props.status?.reblogBy;
     const masto = props.api;
     if (!masto) throw new Error("No Mastodon API");
     const weightAdjust = props.weightAdjust;
+
+    // Increase attModal on Right Arrow
+    React.useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (attModal === -1) return
+            if (e.key === "ArrowRight" && attModal < status.mediaAttachments.length - 1) {
+                setAttModal(attModal + 1)
+            } else if (e.key === "ArrowLeft" && attModal > 0) {
+                setAttModal(attModal - 1)
+            }
+        }
+        window.addEventListener('keydown', handleKeyDown)
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+        }
+    }, [attModal])
+
 
     const resolve = async (status: StatusType): Promise<StatusType> => {
         if (status.uri.includes(props.user.server)) {
@@ -81,13 +98,22 @@ export default function StatusComponent(props: StatusComponentProps) {
     return (
         <div>
             {
-                status.mediaAttachments.length > 0 && status.mediaAttachments[0].type === "image" && (
-                    <Modal show={imageModal} onHide={() => setImageModal(false)}>
+                status.mediaAttachments.length > 0 && (
+                    <Modal show={attModal != -1} onHide={() => setAttModal(-1)}>
                         <Modal.Header closeButton>
                             <Modal.Title>{parse(status.content)[100]}</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            <img width={"100%"} src={status.mediaAttachments[0].url} alt={status.mediaAttachments[0].description ?? ""} />
+
+                            {status.mediaAttachments[attModal]?.type === "image" &&
+                                <img width={"100%"} src={status.mediaAttachments[attModal]?.url} alt={status.mediaAttachments[attModal]?.description ?? ""} />
+                            }
+                            {status.mediaAttachments[attModal]?.type === "video" &&
+                                <video width={"100%"} controls>
+                                    <source src={status.mediaAttachments[attModal]?.url} type="video/mp4" />
+                                    Your browser does not support the video tag.
+                                </video>
+                            }
                         </Modal.Body>
                     </Modal>
                 )
@@ -101,7 +127,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                         <p>Score: {status.value}</p>
                         <p>Weights: {
                             Object.keys(status.scores).map(key => (
-                                <p>{key}: {status.scores[key]}</p>
+                                <p key={key}>{key}: {status.scores[key]}</p>
                             ))
                         }</p>
                     </Modal.Body>
@@ -184,15 +210,25 @@ export default function StatusComponent(props: StatusComponentProps) {
                     {!status.card &&
                         status.mediaAttachments.filter(att => att.type === "image").length > 0 && (
                             <div className="media-gallery" style={{ height: "314.4375px" }}>
-                                {status.mediaAttachments.filter(att => att.type === "image").map(att => (
-                                    <div className="media-gallery__item" style={{ inset: "auto", width: "100%", height: "100%" }}>
+                                {status.mediaAttachments.filter(att => att.type === "image").map((att, i) => (
+                                    <div className="media-gallery__item" style={{ inset: "auto", width: 1 / status.mediaAttachments.length * 100 + "%", height: "100%" }} key={i}>
                                         <canvas className="media-gallery__preview media-gallery__preview--hidden" width="32" height="32" />
-                                        <img src={att.url} onClick={() => setImageModal(true)} sizes="559px" alt={att.description} style={{ objectPosition: "50%", width: "100%" }} />
+                                        <img src={att.previewUrl} onClick={() => setAttModal(i)} sizes="559px" alt={att.description} style={{ objectPosition: "50%", width: "100%" }} />
                                     </div>
                                 ))}
                             </div>
                         )
                     }
+                    {status.mediaAttachments.filter(att => att.type === "video").length > 0 && (
+                        <div className="media-gallery" style={{ height: "314.4375px" }}>
+                            {status.mediaAttachments.filter(att => att.type === "video").map((att, i) => (
+                                <div className="media-gallery__item" style={{ inset: "auto", width: "100%", height: "100%" }} key={i}>
+                                    <canvas className="media-gallery__preview media-gallery__preview--hidden" width="32" height="32" />
+                                    <video src={att.url} onClick={() => setAttModal(i)} style={{ objectPosition: "50%", width: "100%" }} />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                     <div className="status__action-bar">
                         <button onClick={followUri} type="button" aria-label="Antworten" aria-hidden="false" title="Antworten" className="status__action-bar__button icon-button icon-button--with-counter" style={{ fontSize: "18px", width: "auto", height: "23.142857px", lineHeight: "18px" }} >
                             <i className="fa fa-reply fa-fw" aria-hidden="true">
@@ -228,7 +264,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                                 i
                             </i>
                         </button>
-                        <button onClick={followUri} type="button" aria-label="Teilen" aria-hidden="false" title="Teilen" className="status__action-bar__button icon-button" style={{ fontSize: "18px", width: "auto", height: "23.142857px", lineHeight: "18px" }} >
+                        <button onClick={followUri} type="button" aria-label="Auf eigenem Server öffnen" aria-hidden="false" title="Teilen" className="status__action-bar__button icon-button" style={{ fontSize: "18px", width: "auto", height: "23.142857px", lineHeight: "18px" }} >
                             <i className="fa fa-share-alt fa-fw" aria-hidden="true">
                             </i>
                         </button>
