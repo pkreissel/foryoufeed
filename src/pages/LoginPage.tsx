@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { createRestAPIClient } from 'masto';
 import { stringifyQuery } from 'ufo'
 import Button from 'react-bootstrap/esm/Button';
@@ -7,28 +7,31 @@ import { usePersistentState } from "react-persistent-state"
 import { useLocalStorage, AppStorage } from "../hooks/useLocalStorage";
 
 export default function LoginPage() {
-    const [server, setServer, clearServer] = usePersistentState<string>("", "server");
-    const [app, setApp] = useLocalStorage({ keyName: "app", defaultValue: {} } as AppStorage)
+    const [server, setServer] = usePersistentState<string>("", "server");
 
-    const loginRedirect = async (event: any): Promise<void> => {
+    const [_app, setApp] = useLocalStorage({ keyName: "app", defaultValue: {} } as AppStorage)
+
+    const loginRedirect = async (): Promise<void> => {
         const sanitized_server = server.replace("https://", "").replace("http://", "");
         const api = await createRestAPIClient({
             url: `https://${sanitized_server}`,
         });
         const scope = "read:favourites read:follows read:search read:accounts read:statuses write:favourites write:statuses write:follows read:notifications"
+        const redirectUri = window.location.origin + "/callback"
         const app = await api.v1.apps.create({
             clientName: "ForYouFeed",
-            redirectUris: window.location.origin + "/callback",
+            redirectUris: redirectUri,
             scopes: scope,
             website: `https://${sanitized_server}`,
         });
         console.log(app)
-        setApp(app)
+
+        setApp({ ...app, redirectUri })
         const query = stringifyQuery({
             client_id: app.clientId,
             scope: scope,
             response_type: 'code',
-            redirect_uri: window.location.origin + "/callback",
+            redirect_uri: redirectUri
         })
 
         window.location.href = `https://${sanitized_server}/oauth/authorize?${query}`

@@ -9,21 +9,28 @@ import Container from "react-bootstrap/esm/Container";
 import TheAlgorithm from "fedialgo"
 import WeightSetter from "../components/WeightSetter";
 import { usePersistentState } from "react-persistent-state";
+import { Modal } from "react-bootstrap";
 
 
 const Feed = () => {
     //Contruct Feed on Page Load
-    const [feed, setFeed] = useState<StatusType[]>([]); //feed to display
-    //const [_api, setApi] = useState<mastodon.rest.Client>(null); //save api object for later use
+    const { user, logout } = useAuth();
+
+    const [feed, setFeed] = usePersistentState<StatusType[]>([], user.id + "feed"); //feed to display
     const [error, setError] = useState<string>("");
-    const [records, setRecords] = useState<number>(20); //how many records to show
+    const [records, setRecords] = usePersistentState<number>(20, user.id + "records"); //how many records to show
+    const [scrollPos, setScrollPos] = usePersistentState<number>(0, user.id + "scroll"); //scroll position
     const [weights, setWeights] = useState<weightsType>({}); //weights for each factor
     const [settings, setSettings] = usePersistentState<settingsType>({
         "reposts": true,
         "onlyLinks": false,
     }, "settings"); //settings for feed
+
+    window.addEventListener("scroll", () => {
+        if (window.scrollY % 10 == 0) setScrollPos(window.scrollY)
+    })
+
     const [algoObj, setAlgo] = useState<TheAlgorithm>(null); //algorithm to use 
-    const { user, logout } = useAuth();
     const api = loginMasto({
         url: user.server,
         accessToken: user.access_token,
@@ -31,7 +38,16 @@ const Feed = () => {
     const bottomRef = useRef<HTMLDivElement>(null);
     const isBottom = useOnScreen(bottomRef)
     useEffect(() => {
-        constructFeed();
+        // only reload feed if the newest status is older than 10 minutes
+        const lastStatus = feed.reduce((prev, current) => (prev.createdAt > current.createdAt) ? prev : current, { createdAt: "1970-01-01T00:00:00.000Z" })
+        console.log("last status", lastStatus)
+        if (lastStatus && (Date.now() - (new Date(lastStatus.createdAt)).getTime()) > 1800 * 1000) {
+            setRecords(20)
+            constructFeed()
+        } else {
+            console.log("loaded from cache")
+            restoreFeedCache()
+        }
     }, []);
 
     useEffect(() => {
@@ -40,6 +56,22 @@ const Feed = () => {
             loadMore()
         }
     }, [isBottom])
+
+    const restoreFeedCache = async () => {
+        if (user) {
+            let currUser: mastodon.v1.Account
+            try {
+                currUser = await api.v1.accounts.verifyCredentials();
+            } catch (error) {
+                console.log(error)
+                logout()
+            }
+            const algo = new TheAlgorithm(api, currUser)
+            window.scrollTo(0, scrollPos)
+            setWeights(await algo.getWeights())
+            setAlgo(algo)
+        }
+    }
 
     const constructFeed = async () => {
         if (user) {
@@ -53,10 +85,6 @@ const Feed = () => {
             const algo = new TheAlgorithm(api, currUser)
 
             const feed: StatusType[] = await algo.getFeed()
-            console.log(feed)
-            if (isNaN(feed[0].value)) {
-                throw new Error("Feed Value is not a number")
-            }
 
             setWeights(await algo.getWeights())
             setFeed(feed)
@@ -97,6 +125,12 @@ const Feed = () => {
 
     return (
         <Container style={{ maxWidth: "600px", height: "auto" }}>
+            <Modal show={error !== ""} onHide={() => setError("")}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Error</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>{error}</Modal.Body>
+            </Modal>
             <WeightSetter
                 weights={weights}
                 updateWeights={updateWeights}
@@ -113,7 +147,7 @@ const Feed = () => {
                     pass = pass && (status.reblog == null)
                 }
                 return pass
-            }).slice(0, Math.max(20, records)).map((status: any, index) => {
+            }).slice(0, Math.max(20, records)).map((status: StatusType) => {
                 return (
                     <StatusComponent
                         status={status}
@@ -121,6 +155,7 @@ const Feed = () => {
                         user={user}
                         weightAdjust={weightAdjust}
                         key={status.uri}
+                        setError={setError}
                     />
                 )
             })}

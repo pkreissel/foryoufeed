@@ -10,18 +10,16 @@ export interface settingsType {
 
 export interface StatusType extends mastodon.v1.Status {
     topPost?: boolean;
+    recommended?: boolean;
     scores?: weightsType;
     value?: number;
     reblog?: StatusType;
     reblogBy?: string;
 }
 
-
-export type App = {
-    clientId: string;
-    clientSecret: string;
+export interface App extends mastodon.v1.Client {
     redirectUri: string;
-    website: string;
+    [key: string]: unknown;
 }
 
 export type User = {

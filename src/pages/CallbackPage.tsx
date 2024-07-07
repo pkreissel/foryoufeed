@@ -1,14 +1,14 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { createRestAPIClient as loginMasto } from "masto"
-import { useLocalStorage, AppStorage } from '../hooks/useLocalStorage';
+import { useAppStorage } from '../hooks/useLocalStorage';
 import { useAuth } from '../hooks/useAuth';
 import { User } from '../types';
 
 export default function CallbackPage() {
     const [error, setError] = React.useState("");
     const [searchParams] = useSearchParams();
-    const [app] = useLocalStorage({ keyName: "app", defaultValue: {} } as AppStorage)
+    const [app] = useAppStorage({ keyName: "app", defaultValue: null })
     const { user, loginUser } = useAuth();
     console.log(loginUser)
     const code = searchParams.get('code');
@@ -25,12 +25,12 @@ export default function CallbackPage() {
         const body = new FormData();
         const scope = "read:favourites read:follows read:search read:accounts read:statuses write:favourites write:statuses write:follows"
         body.append('grant_type', 'authorization_code');
-        body.append('client_id', app.clientId);
-        body.append('client_secret', app.clientSecret);
-        body.append('redirect_uri', app.redirectUri);
+        body.append('client_id', app.clientId)
+        body.append('client_secret', app.clientSecret)
+        body.append('redirect_uri', app.redirectUri)
         body.append('code', code);
         body.append('scope', scope);
-        const result: any = await fetch(`${app.website}/oauth/token`, {
+        const result = await fetch(`${app.website}/oauth/token`, {
             method: 'POST',
             body,
         })

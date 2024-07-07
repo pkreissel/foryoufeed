@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { App, User } from "../types";
+import { User, App } from "../types";
+
 
 type StorageKey = {
     keyName: string;
-    defaultValue: any;
+    defaultValue: Record<string, unknown> | null;
 }
 
 export interface AppStorage extends StorageKey {
     keyName: "app";
-    defaultValue: App | {};
+    defaultValue: App | null;
 }
 
 export interface UserStorage extends StorageKey {
@@ -16,17 +17,17 @@ export interface UserStorage extends StorageKey {
     defaultValue: User | null;
 }
 
-export const useAppStorage = (key: AppStorage): [App, () => void] => {
-    return useLocalStorage(key);
+export const useAppStorage = (key: AppStorage) => {
+    return useLocalStorage<AppStorage>(key);
 }
 
-export const useUserStorage = (key: UserStorage): [User, () => void] => {
-    return useLocalStorage(key);
+export const useUserStorage = (key: UserStorage) => {
+    return useLocalStorage<UserStorage>(key);
 }
 
-export const useLocalStorage = (key: StorageKey): StorageKey["defaultValue"] => {
+export const useLocalStorage = <T extends StorageKey,>(key: T): [T["defaultValue"], (value: T["defaultValue"]) => void] => {
     const { keyName, defaultValue } = key;
-    const [storedValue, setStoredValue] = useState((): any => {
+    const [storedValue, setStoredValue] = useState<T["defaultValue"]>(() => {
         try {
             const value = window.localStorage.getItem(keyName);
             if (value) {
@@ -36,13 +37,14 @@ export const useLocalStorage = (key: StorageKey): StorageKey["defaultValue"] => 
                 return defaultValue;
             }
         } catch (err) {
+            console.error(err);
             return defaultValue;
         }
     });
-    const setValue = (newValue: any) => {
+    const setValue = (newValue: T["defaultValue"]) => {
         try {
             window.localStorage.setItem(keyName, JSON.stringify(newValue));
-        } catch (err) { }
+        } catch (err) { console.error(err); }
         setStoredValue(newValue);
     };
     return [storedValue, setValue];

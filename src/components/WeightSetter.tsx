@@ -21,9 +21,9 @@ const WeightSetter = ({ weights, updateWeights, settings, updateSettings, algoOb
             <Accordion.Item eventKey="0">
                 <Accordion.Header>Feed Algorithmus</Accordion.Header>
                 <Accordion.Body>
-                    {weights && Object.keys(weights).map((key) => {
+                    {weights && Object.keys(weights).map((key, index) => {
                         return (
-                            <Form.Group className="mb-3">
+                            <Form.Group className="mb-3" key={index}>
                                 <Form.Label><b>{key + " - "}</b>{algoObj.getDescription(key) + ": " + (weights[key]?.toFixed(2) ?? "1")}</Form.Label>
                                 <Form.Range
                                     min={0}
@@ -40,9 +40,9 @@ const WeightSetter = ({ weights, updateWeights, settings, updateSettings, algoOb
                             </Form.Group>
                         )
                     })}
-                    {settings && Object.keys(settings).map((key) => {
+                    {settings && Object.keys(settings).map((key, index) => {
                         return (
-                            <Form.Group className="mb-3">
+                            <Form.Group className="mb-3" key={index}>
                                 <Form.Check
                                     type="checkbox"
                                     label={key}
