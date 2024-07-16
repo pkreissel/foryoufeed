@@ -18,6 +18,7 @@ const Feed = () => {
 
     const [feed, setFeed] = usePersistentState<StatusType[]>([], user.id + "feed"); //feed to display
     const [error, setError] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(true); //
     const [records, setRecords] = usePersistentState<number>(20, user.id + "records"); //how many records to show
     const [scrollPos, setScrollPos] = usePersistentState<number>(0, user.id + "scroll"); //scroll position
     const [weights, setWeights] = useState<weightsType>({}); //weights for each factor
@@ -44,9 +45,11 @@ const Feed = () => {
         if (lastStatus && (Date.now() - (new Date(lastStatus.createdAt)).getTime()) > 1800 * 1000) {
             setRecords(20)
             constructFeed()
+            setLoading(false)
         } else {
             console.log("loaded from cache")
             restoreFeedCache()
+            setLoading(false)
         }
     }, []);
 
@@ -138,7 +141,7 @@ const Feed = () => {
                 settings={settings}
                 updateSettings={updateSettings}
             />
-            {api && (feed.length > 1) && feed.filter((status: StatusType) => {
+            {!loading && api && (feed.length > 1) && feed.filter((status: StatusType) => {
                 let pass = true
                 if (settings.onlyLinks) {
                     pass = !(status.card == null && status?.reblog?.card == null)
@@ -159,7 +162,7 @@ const Feed = () => {
                     />
                 )
             })}
-            {feed.length < 1 &&
+            {feed.length < 1 || loading &&
                 <FullPageIsLoading />
             }
             <div ref={bottomRef} onClick={loadMore}>Load More</div>
