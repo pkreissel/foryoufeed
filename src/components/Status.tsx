@@ -209,7 +209,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                     )}
                     {!status.card &&
                         status.mediaAttachments.filter(att => att.type === "image").length > 0 && (
-                            <div className="media-gallery" style={{ height: "314.4375px" }}>
+                            <div className="media-gallery" style={{ height: "314.4375px", overflow: "hidden" }}>
                                 {status.mediaAttachments.filter(att => att.type === "image").map((att, i) => (
                                     <div className="media-gallery__item" style={{ inset: "auto", width: 1 / status.mediaAttachments.length * 100 + "%", height: "100%" }} key={i}>
                                         <canvas className="media-gallery__preview media-gallery__preview--hidden" width="32" height="32" />
@@ -220,7 +220,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                         )
                     }
                     {status.mediaAttachments.filter(att => att.type === "video").length > 0 && (
-                        <div className="media-gallery" style={{ height: "314.4375px" }}>
+                        <div className="media-gallery" style={{ height: "314.4375px", overflow: "hidden" }}>
                             {status.mediaAttachments.filter(att => att.type === "video").map((att, i) => (
                                 <div className="media-gallery__item" style={{ inset: "auto", width: "100%", height: "100%" }} key={i}>
                                     <canvas className="media-gallery__preview media-gallery__preview--hidden" width="32" height="32" />
@@ -260,12 +260,12 @@ export default function StatusComponent(props: StatusComponentProps) {
                             </span>
                         </button>
                         <button onClick={showScore} type="button" aria-label="Score" aria-hidden="false" title="Score" className="status__action-bar__button icon-button" style={{ fontSize: "18px", width: "20px", height: "23.142857px", lineHeight: "18px" }} >
-                            <i className="fa fa-pie-chart fa-fw" title="Empfohlen">
+                            <i className="fa fa-pie-chart fa-fw" title="Info">
                                 i
                             </i>
                         </button>
-                        <button onClick={followUri} type="button" aria-label="Auf eigenem Server öffnen" aria-hidden="false" title="Teilen" className="status__action-bar__button icon-button" style={{ fontSize: "18px", width: "auto", height: "23.142857px", lineHeight: "18px" }} >
-                            <i className="fa fa-share-alt fa-fw" aria-hidden="true">
+                        <button onClick={followUri} type="button" aria-label="Auf eigenem Server öffnen" aria-hidden="false" title="Open on your instance" className="status__action-bar__button icon-button" style={{ fontSize: "18px", width: "auto", height: "23.142857px", lineHeight: "18px" }} >
+                            <i className="fa fa-link fa-fw" aria-hidden="true">
                             </i>
                         </button>
                     </div>

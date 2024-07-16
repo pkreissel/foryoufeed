@@ -6,9 +6,9 @@ import TheAlgorithm from "fedialgo"
 
 interface WeightSetterProps {
     weights: weightsType,
-    updateWeights: (weights) => void,
+    updateWeights: (weights: weightsType) => void,
     settings: settingsType,
-    updateSettings: (settings) => void,
+    updateSettings: (settings: settingsType) => void,
     algoObj: TheAlgorithm
 }
 
