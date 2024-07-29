@@ -10,6 +10,7 @@ import TheAlgorithm from "fedialgo"
 import WeightSetter from "../components/WeightSetter";
 import { usePersistentState } from "react-persistent-state";
 import { Modal } from "react-bootstrap";
+import FindFollowers from "../components/FindFollowers";
 
 
 const Feed = () => {
@@ -141,6 +142,7 @@ const Feed = () => {
                 settings={settings}
                 updateSettings={updateSettings}
             />
+            <FindFollowers api={api} user={user} />
             {!loading && api && (feed.length > 1) && feed.filter((status: StatusType) => {
                 let pass = true
                 if (settings.onlyLinks) {

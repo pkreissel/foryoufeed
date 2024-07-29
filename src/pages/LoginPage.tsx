@@ -16,7 +16,7 @@ export default function LoginPage() {
         const api = await createRestAPIClient({
             url: `https://${sanitized_server}`,
         });
-        const scope = "read:favourites read:follows read:search read:accounts read:statuses write:favourites write:statuses write:follows read:notifications"
+        const scope = "read write:favourites write:statuses write:follows"
         const redirectUri = window.location.origin + "/callback"
         const app = await api.v1.apps.create({
             clientName: "ForYouFeed",
@@ -52,6 +52,9 @@ export default function LoginPage() {
                         Fedi-Feed features a customizable algorithm for sorting your feed.
                         <br />
                         You can choose which factors influence the sorting of your feed.
+                        <br />
+                        None of your data is stored on our servers.
+                        All calculations are done in your browser.
                         <br />
                         To get started:
                         <br />
