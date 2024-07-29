@@ -1,21 +1,25 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import Accordion from 'react-bootstrap/esm/Accordion'
 import Form from 'react-bootstrap/esm/Form'
 import { settingsType, weightsType } from "../types";
 import TheAlgorithm from "fedialgo"
+import { usePersistentState } from "react-persistent-state";
+import { useAuth } from '../hooks/useAuth';
 
 interface WeightSetterProps {
     weights: weightsType,
     updateWeights: (weights: weightsType) => void,
     settings: settingsType,
     updateSettings: (settings: settingsType) => void,
+    languages: string[],
+    setSelectedLanguages: (languages: string[]) => void,
     algoObj: TheAlgorithm
 }
 
-const WeightSetter = ({ weights, updateWeights, settings, updateSettings, algoObj }: WeightSetterProps) => {
-    useEffect(() => {
-        console.log(settings)
-    }, [settings])
+const WeightSetter = ({ weights, updateWeights, settings, updateSettings, languages, setSelectedLanguages, algoObj }: WeightSetterProps) => {
+    const { user } = useAuth();
+    const [selectedLang, setLang] = usePersistentState<string[]>([], user.id + "selectedLangs")
+
     return (
         <Accordion>
             <Accordion.Item eventKey="0">
@@ -58,6 +62,31 @@ const WeightSetter = ({ weights, updateWeights, settings, updateSettings, algoOb
                             </Form.Group>
                         )
                     })}
+                    <Form.Group className="mb-3">
+                        <Form.Label><b>Show only these Languages</b></Form.Label>
+                        {languages.map((lang, index) => {
+                            return (
+                                <Form.Check
+                                    type="checkbox"
+                                    label={lang}
+                                    id={lang}
+                                    key={index}
+                                    checked={selectedLang.includes(lang)}
+                                    disabled={false}
+                                    onChange={(e) => {
+                                        const newLang = [...selectedLang]
+                                        if (e.target.checked) {
+                                            newLang.push(lang)
+                                        } else {
+                                            newLang.splice(newLang.indexOf(lang), 1)
+                                        }
+                                        setLang(newLang)
+                                        setSelectedLanguages(newLang)
+                                    }}
+                                />
+                            )
+                        })}
+                    </Form.Group>
                 </Accordion.Body>
             </Accordion.Item>
         </Accordion>

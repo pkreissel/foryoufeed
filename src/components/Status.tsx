@@ -2,11 +2,12 @@ import React from 'react';
 import "../birdUI.css";
 import "../default.css";
 import { StatusType, weightsType } from '../types';
-import Modal from 'react-bootstrap/Modal';
 import parse from 'html-react-parser'
 import { mastodon } from 'masto';
 import { User } from '../types';
 import Toast from 'react-bootstrap/Toast';
+import { AttachmentsModal } from './AttachmentsModal';
+import { ScoreModal } from './ScoreModal';
 
 interface StatusComponentProps {
     status: StatusType,
@@ -86,6 +87,7 @@ export default function StatusComponent(props: StatusComponentProps) {
         weightAdjust(status.scores)
         console.log(status_)
         //new tab:
+        //window.open(props.user.server + "/@" + status_.account.acct + "/" + status_.id, '_blank');
         window.location.href = props.user.server + "/@" + status_.account.acct + "/" + status_.id
     }
 
@@ -99,40 +101,11 @@ export default function StatusComponent(props: StatusComponentProps) {
         <div>
             {
                 status.mediaAttachments.length > 0 && (
-                    <Modal show={attModal != -1} onHide={() => setAttModal(-1)}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>{parse(status.content)[100]}</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-
-                            {status.mediaAttachments[attModal]?.type === "image" &&
-                                <img width={"100%"} src={status.mediaAttachments[attModal]?.url} alt={status.mediaAttachments[attModal]?.description ?? ""} />
-                            }
-                            {status.mediaAttachments[attModal]?.type === "video" &&
-                                <video width={"100%"} controls>
-                                    <source src={status.mediaAttachments[attModal]?.url} type="video/mp4" />
-                                    Your browser does not support the video tag.
-                                </video>
-                            }
-                        </Modal.Body>
-                    </Modal>
+                    <AttachmentsModal attModal={attModal} setAttModal={setAttModal} status={status} />
                 )
             }
-            {
-                <Modal show={scoreModal} onHide={() => setScoreModal(false)} style={{ color: "black" }}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Score</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <p>Score: {status.value}</p>
-                        <p>Weights: {
-                            Object.keys(status.scores).map(key => (
-                                <p key={key}>{key}: {status.scores[key]}</p>
-                            ))
-                        }</p>
-                    </Modal.Body>
-                </Modal>
-            }
+
+            <ScoreModal scoreModal={scoreModal} setScoreModal={setScoreModal} status={status} />
             <Toast show={Boolean(error)} delay={3000} autohide>
                 <Toast.Header>
                     <strong className="me-auto">Error</strong>
@@ -151,7 +124,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                         <span>
                             <a data-id="109357260772763021" href="/@mcnees@mastodon.social" className="status__display-name muted">
                                 <bdi><strong>{status.reblogBy}</strong></bdi>
-                            </a> teilte
+                            </a> shared
                         </span>
                     </div>
                 }
@@ -166,14 +139,14 @@ export default function StatusComponent(props: StatusComponentProps) {
                                     </i>
                                 )}
                                 {status?.recommended && (
-                                    <i className="fa fa-bolt" title="Empfohlen">
+                                    <i className="fa fa-bolt" title="Recommended By AI">
                                     </i>
                                 )}
 
                             </span>
                             <time dateTime={status.createdAt} title={status.createdAt}>{(new Date(status.createdAt)).toLocaleTimeString()}</time>
                         </a>
-                        <a href={props.user.server + "/@" + status.account.acct} title={status.account.acct} className="status__display-name" target="_blank" rel="noopener noreferrer">
+                        <div title={status.account.acct} className="status__display-name">
                             <div className="status__avatar">
                                 <div className="account__avatar" style={{ width: "46px", height: "46px" }}>
                                     <img src={status.account.avatar} alt="{status.account.acct}" />
@@ -182,12 +155,22 @@ export default function StatusComponent(props: StatusComponentProps) {
 
                             <span className="display-name">
                                 <bdi>
-                                    <strong className="display-name__html">{status.account.displayName}
+                                    <strong className="display-name__html">
+                                        <a href={props.user.server + "/@" + status.account.acct} target="_blank" rel="noopener noreferrer" style={{ color: "white", textDecoration: "none" }}>
+                                            {status.account.displayName}
+                                        </a>
+                                        {status.account.fields.filter(f => f.verifiedAt).map(f => (
+                                            <span key={f.name} className="verified-badge" title={f.value.replace(/<[^>]*>?/gm, '')} style={{ color: "lightblue", padding: "0px 5px" }}>
+                                                <i className="fa fa-check-circle" aria-hidden="true">
+                                                </i>
+                                            </span>
+                                        ))}
                                     </strong>
                                 </bdi>
                                 <span className="display-name__account">@{status.account.acct}</span>
+
                             </span>
-                        </a>
+                        </div>
                     </div>
                     <div className="status__content status__content--with-action" >
                         <div className="status__content__text status__content__text--visible translate" lang="en">
