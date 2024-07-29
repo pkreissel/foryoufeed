@@ -23,6 +23,7 @@ const Feed = () => {
     const [records, setRecords] = usePersistentState<number>(20, user.id + "records"); //how many records to show
     const [scrollPos, setScrollPos] = usePersistentState<number>(0, user.id + "scroll"); //scroll position
     const [weights, setWeights] = useState<weightsType>({}); //weights for each factor
+    const [filteredLanguages, setFilteredLanguages] = useState<string[]>(["en", "de"]); //languages to filter
     const [settings, setSettings] = usePersistentState<settingsType>({
         "reposts": true,
         "onlyLinks": false,
@@ -33,7 +34,7 @@ const Feed = () => {
     })
 
     const [algoObj, setAlgo] = useState<TheAlgorithm>(null); //algorithm to use 
-    const api = loginMasto({
+    const api: mastodon.rest.Client = loginMasto({
         url: user.server,
         accessToken: user.access_token,
     });
@@ -71,9 +72,9 @@ const Feed = () => {
                 logout()
             }
             const algo = new TheAlgorithm(api, currUser)
-            window.scrollTo(0, scrollPos)
             setWeights(await algo.getWeights())
             setAlgo(algo)
+            window.scrollTo(0, scrollPos)
         }
     }
 
@@ -128,7 +129,7 @@ const Feed = () => {
 
 
     return (
-        <Container style={{ maxWidth: "600px", height: "auto" }}>
+        <Container style={{ maxWidth: "700px", height: "auto" }}>
             <Modal show={error !== ""} onHide={() => setError("")}>
                 <Modal.Header closeButton>
                     <Modal.Title>Error</Modal.Title>
@@ -140,6 +141,11 @@ const Feed = () => {
                 updateWeights={updateWeights}
                 algoObj={algoObj}
                 settings={settings}
+                languages={feed.reduce((acc, item) => {
+                    if (!acc.includes(item.language)) acc.push(item.language)
+                    return acc
+                }, [])}
+                setSelectedLanguages={setFilteredLanguages}
                 updateSettings={updateSettings}
             />
             <FindFollowers api={api} user={user} />
@@ -150,6 +156,9 @@ const Feed = () => {
                 }
                 if (!settings.reposts) {
                     pass = pass && (status.reblog == null)
+                }
+                if (filteredLanguages.length > 0) {
+                    pass = pass && (filteredLanguages.includes(status.language))
                 }
                 return pass
             }).slice(0, Math.max(20, records)).map((status: StatusType) => {
@@ -164,7 +173,7 @@ const Feed = () => {
                     />
                 )
             })}
-            {feed.length < 1 || loading &&
+            {(feed.length < 1 || loading) &&
                 <FullPageIsLoading />
             }
             <div ref={bottomRef} onClick={loadMore}>Load More</div>

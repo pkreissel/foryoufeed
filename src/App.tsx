@@ -8,7 +8,7 @@ import CallbackPage from './pages/CallbackPage';
 import LoginPage from './pages/LoginPage';
 import LogoutPage from './pages/LogoutPage';
 import Feed from './pages/Feed';
-import { AuthProvider, useAuth } from './hooks/useAuth';
+import { AuthProvider } from './hooks/useAuth';
 import { inject } from '@vercel/analytics';
 
 const App: React.FC = () => {
