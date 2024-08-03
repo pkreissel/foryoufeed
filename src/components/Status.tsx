@@ -8,6 +8,7 @@ import { User } from '../types';
 import Toast from 'react-bootstrap/Toast';
 import { AttachmentsModal } from './AttachmentsModal';
 import { ScoreModal } from './ScoreModal';
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 interface StatusComponentProps {
     status: StatusType,
@@ -149,7 +150,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                         <div title={status.account.acct} className="status__display-name">
                             <div className="status__avatar">
                                 <div className="account__avatar" style={{ width: "46px", height: "46px" }}>
-                                    <img src={status.account.avatar} alt="{status.account.acct}" />
+                                    <LazyLoadImage src={status.account.avatar} alt="{status.account.acct}" />
                                 </div>
                             </div>
 
@@ -181,7 +182,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                         <a href={status.card.url} onClick={() => weightAdjust(status.scores)} className="status-card compact" target="_blank" rel="noopener noreferrer">
                             <div className="status-card__image">
                                 <canvas className="status-card__image-preview status-card__image-preview--hidden" width="32" height="32"></canvas>
-                                <img style={{ maxHeight: "30vh" }} src={status.card.image} alt="" className="status-card__image-image" />
+                                <LazyLoadImage style={{ maxHeight: "30vh" }} src={status.card.image} alt="" className="status-card__image-image" />
                             </div>
                             <div className='status-card__content'>
                                 <span className='status-card__host'>{status.card.providerName}</span>
@@ -196,7 +197,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                                 {status.mediaAttachments.filter(att => att.type === "image").map((att, i) => (
                                     <div className="media-gallery__item" style={{ inset: "auto", width: 1 / status.mediaAttachments.length * 100 + "%", height: "100%" }} key={i}>
                                         <canvas className="media-gallery__preview media-gallery__preview--hidden" width="32" height="32" />
-                                        <img src={att.previewUrl} onClick={() => setAttModal(i)} sizes="559px" alt={att.description} style={{ objectPosition: "50%", width: "100%" }} />
+                                        <LazyLoadImage src={att.previewUrl} onClick={() => setAttModal(i)} sizes="559px" alt={att.description} style={{ objectPosition: "50%", width: "100%" }} />
                                     </div>
                                 ))}
                             </div>
@@ -207,7 +208,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                             {status.mediaAttachments.filter(att => att.type === "video").map((att, i) => (
                                 <div className="media-gallery__item" style={{ inset: "auto", width: "100%", height: "100%" }} key={i}>
                                     <canvas className="media-gallery__preview media-gallery__preview--hidden" width="32" height="32" />
-                                    <video src={att.url} onClick={() => setAttModal(i)} style={{ objectPosition: "50%", width: "100%" }} />
+                                    <LazyLoadImage scr={att.previewUrl} onClick={() => setAttModal(i)} sizes="559px" alt={att.description} style={{ objectPosition: "50%", width: "100%" }} />
                                 </div>
                             ))}
                         </div>

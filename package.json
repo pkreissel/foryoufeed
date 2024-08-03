@@ -15,6 +15,7 @@
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.4",
     "react-dom": "^18.2.0",
+    "react-lazy-load-image-component": "^1.6.2",
     "react-persistent-state": "^1.1.8",
     "react-router-dom": "^6.10.0",
     "ufo": "^1.1.1",
