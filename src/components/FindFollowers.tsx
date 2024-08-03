@@ -7,12 +7,14 @@ import { User } from '../types';
 
 export default function FindFollowers({ api, user }: { api: mastodon.rest.Client, user: User }) {
     const [suggestions, setSuggestions] = useState<mastodon.v1.Suggestion[]>([])
+    const [open, setOpen] = useState<boolean>(false)
 
     useEffect(() => {
+        if (!open || suggestions.length > 0) return
         api.v2.suggestions.list().then((res) => {
             setSuggestions(res)
         })
-    }, [])
+    }, [open])
 
     const follow = (id: string) => {
         api.v1.accounts.$select(id).follow().then(() => {
@@ -29,9 +31,9 @@ export default function FindFollowers({ api, user }: { api: mastodon.rest.Client
 
     return (
         <Accordion>
-            <Accordion.Item eventKey="0">
+            <Accordion.Item eventKey="0" >
                 <Accordion.Header>Find Followers</Accordion.Header>
-                <Accordion.Body>
+                <Accordion.Body onEnter={() => setOpen(true)}>
                     <Row className="g-4 m-3">
                         {suggestions.length == 0 && (
                             <div>If this does not work, log out and login again</div>
@@ -41,9 +43,11 @@ export default function FindFollowers({ api, user }: { api: mastodon.rest.Client
                             .map((suggestion: mastodon.v1.Suggestion, index: number) => {
                                 return (
                                     <Col key={index} sm={12} md={6} >
-                                        <a href={`https://${user.server}/@${suggestion.account.acct}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
-                                            <Card className="h-100 shadow-sm">
-                                                <Card.Body className="d-flex flex-column">
+                                        <Card className="h-100 shadow-sm">
+
+                                            <Card.Body className="d-flex flex-column">
+                                                <a href={`https://${user.server}/@${suggestion.account.acct}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+
                                                     <div className="d-flex align-items-center mb-3">
                                                         <img
                                                             src={suggestion.account.avatar}
@@ -60,27 +64,27 @@ export default function FindFollowers({ api, user }: { api: mastodon.rest.Client
                                                             </Card.Text>
                                                         </div>
                                                     </div>
-                                                    <Card.Text className="flex-grow-1">
-                                                        {parse(suggestion.account.note)}
-                                                    </Card.Text>
-                                                    <div className="mt-3">
-                                                        <Button
-                                                            variant="primary"
-                                                            className="me-2"
-                                                            onClick={() => follow(suggestion.account.id)}
-                                                        >
-                                                            Follow
-                                                        </Button>
-                                                        <Button
-                                                            variant="outline-secondary"
-                                                            onClick={() => hide(suggestion.account.id)}
-                                                        >
-                                                            Hide
-                                                        </Button>
-                                                    </div>
-                                                </Card.Body>
-                                            </Card>
-                                        </a>
+                                                </a>
+                                                <Card.Text className="flex-grow-1">
+                                                    {parse(suggestion.account.note)}
+                                                </Card.Text>
+                                                <div className="mt-3">
+                                                    <Button
+                                                        variant="primary"
+                                                        className="me-2"
+                                                        onClick={() => follow(suggestion.account.id)}
+                                                    >
+                                                        Follow
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline-secondary"
+                                                        onClick={() => hide(suggestion.account.id)}
+                                                    >
+                                                        Hide
+                                                    </Button>
+                                                </div>
+                                            </Card.Body>
+                                        </Card>
                                     </Col>
                                 )
                             })}
