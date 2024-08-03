@@ -30,8 +30,8 @@ const WeightSetter = ({ weights, updateWeights, settings, updateSettings, langua
                             <Form.Group className="mb-3" key={index}>
                                 <Form.Label><b>{key + " - "}</b>{algoObj.getDescription(key) + ": " + (weights[key]?.toFixed(2) ?? "1")}</Form.Label>
                                 <Form.Range
-                                    min={0}
-                                    max={Math.max(...Object.values(weights) ?? [0]) + 1 * 1.2}
+                                    min={Math.min(...Object.values(weights).filter(x => !isNaN(x)) ?? [0]) - 1 * 1.2}
+                                    max={Math.max(...Object.values(weights).filter(x => !isNaN(x)) ?? [0]) + 1 * 1.2}
                                     step={0.01}
                                     id={key}
                                     value={weights[key] ?? 1}
