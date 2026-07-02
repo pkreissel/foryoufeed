@@ -29,6 +29,7 @@ jobs:
         with:
           source: "dist"
           destination: "/"
+          upload: "true"
           storageZoneName: "${{ secrets.BUNNY_STORAGE_ZONE_NAME }}"
           storagePassword: "${{ secrets.BUNNY_STORAGE_PASSWORD }}"
           pullZoneId: "${{ secrets.BUNNY_PULL_ZONE_ID }}"
