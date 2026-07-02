@@ -18,7 +18,7 @@ interface WeightSetterProps {
 
 const WeightSetter = ({ weights, updateWeights, settings, updateSettings, languages, setSelectedLanguages, algoObj }: WeightSetterProps) => {
     const { user } = useAuth();
-    const [selectedLang, setLang] = usePersistentState<string[]>([], user.id + "selectedLangs")
+    const [selectedLang, setLang] = usePersistentState<string[]>([], { storageKey: user.id + "selectedLangs" })
 
     return (
         <Accordion>

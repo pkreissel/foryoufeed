@@ -14,6 +14,8 @@ interface StatusComponentProps {
     status: StatusType,
     api: mastodon.rest.Client,
     user: User,
+    weights: weightsType,
+    setWeights: (weights: weightsType) => void,
     weightAdjust: (statusWeight: weightsType) => void
     setError: (error: string) => void
 }
@@ -26,10 +28,9 @@ export default function StatusComponent(props: StatusComponentProps) {
     const [attModal, setAttModal] = React.useState<number>(-1); //index of the attachment to show
     const [scoreModal, setScoreModal] = React.useState<boolean>(false);
     const [error, _setError] = React.useState<string>("");
+
     status.reblogBy = props.status.reblog ? props.status.account.displayName : props.status?.reblogBy;
-    const masto = props.api;
-    if (!masto) throw new Error("No Mastodon API");
-    const weightAdjust = props.weightAdjust;
+    const { api, weights, user, weightAdjust } = props;
 
     // Increase attModal on Right Arrow
     React.useEffect(() => {
@@ -49,10 +50,10 @@ export default function StatusComponent(props: StatusComponentProps) {
 
 
     const resolve = async (status: StatusType): Promise<StatusType> => {
-        if (status.uri.includes(props.user.server)) {
+        if (status.uri.includes(user.server)) {
             return status;
         } else {
-            const res = await masto.v2.search.fetch({ q: status.uri, resolve: true })
+            const res = await api.v2.search.fetch({ q: status.uri, resolve: true })
             return res.statuses[0]
         }
     }
@@ -63,7 +64,7 @@ export default function StatusComponent(props: StatusComponentProps) {
         reblogged ? console.log("skip") : weightAdjust(status.scores)
         const id = status_.id;
         (async () => {
-            reblogged ? await masto.v1.statuses.$select(id).unreblog() : await masto.v1.statuses.$select(id).reblog();
+            reblogged ? await api.v1.statuses.$select(id).unreblog() : await api.v1.statuses.$select(id).reblog();
             setReblogged(!reblogged)
         })();
     }
@@ -76,7 +77,7 @@ export default function StatusComponent(props: StatusComponentProps) {
         favourited ? console.log("skip") : weightAdjust(status.scores)
         const id = status_.id;
         (async () => {
-            favourited ? await masto.v1.statuses.$select(id).unfavourite() : await masto.v1.statuses.$select(id).favourite();
+            favourited ? await api.v1.statuses.$select(id).unfavourite() : await api.v1.statuses.$select(id).favourite();
             setFavourited(!favourited)
         })();
     }
@@ -89,7 +90,7 @@ export default function StatusComponent(props: StatusComponentProps) {
         console.log(status_)
         //new tab:
         //window.open(props.user.server + "/@" + status_.account.acct + "/" + status_.id, '_blank');
-        window.location.href = props.user.server + "/@" + status_.account.acct + "/" + status_.id
+        window.location.href = user.server + "/@" + status_.account.acct + "/" + status_.id
     }
 
     const showScore = async () => {
@@ -106,7 +107,11 @@ export default function StatusComponent(props: StatusComponentProps) {
                 )
             }
 
-            <ScoreModal scoreModal={scoreModal} setScoreModal={setScoreModal} status={status} />
+            <ScoreModal
+                scoreModal={scoreModal}
+                setScoreModal={setScoreModal}
+                status={status}
+                weights={weights} />
             <Toast show={Boolean(error)} delay={3000} autohide>
                 <Toast.Header>
                     <strong className="me-auto">Error</strong>
@@ -157,7 +162,7 @@ export default function StatusComponent(props: StatusComponentProps) {
                             <span className="display-name">
                                 <bdi>
                                     <strong className="display-name__html">
-                                        <a href={props.user.server + "/@" + status.account.acct} target="_blank" rel="noopener noreferrer" style={{ color: "white", textDecoration: "none" }}>
+                                        <a href={user.server + "/@" + status.account.acct} target="_blank" rel="noopener noreferrer" style={{ color: "white", textDecoration: "none" }}>
                                             {status.account.displayName}
                                         </a>
                                         {status.account.fields.filter(f => f.verifiedAt).map(f => (

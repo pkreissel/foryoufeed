@@ -16,21 +16,20 @@ import FindFollowers from "../components/FindFollowers";
 const Feed = () => {
     //Contruct Feed on Page Load
     const { user, logout } = useAuth();
-
-    const [feed, setFeed] = usePersistentState<StatusType[]>([], user.id + "feed"); //feed to display
+    const [feed, setFeed] = usePersistentState<StatusType[]>([], { storageKey: user.id + "feed" }); //feed to display
     const [error, setError] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(true); //
-    const [records, setRecords] = usePersistentState<number>(20, user.id + "records"); //how many records to show
-    const [scrollPos, setScrollPos] = usePersistentState<number>(0, user.id + "scroll"); //scroll position
+    const [records, setRecords] = usePersistentState<number>(20, { storageKey: user.id + "records" }); //how many records to show
+    const [scrollPos, setScrollPos] = usePersistentState<number>(0, { storageKey: user.id + "scroll" }); //scroll position
     const [weights, setWeights] = useState<weightsType>({}); //weights for each factor
     const [filteredLanguages, setFilteredLanguages] = useState<string[]>(["en", "de"]); //languages to filter
     const [settings, setSettings] = usePersistentState<settingsType>({
         "reposts": true,
         "onlyLinks": false,
-    }, "settings"); //settings for feed
+    }, { storageKey: "settings" }); //settings for feed
 
     window.addEventListener("scroll", () => {
-        if (window.scrollY % 10 == 0) setScrollPos(window.scrollY)
+        if (window.scrollY % 100 == 0) setScrollPos(window.scrollY)
     })
 
     const [algoObj, setAlgo] = useState<TheAlgorithm>(null); //algorithm to use 
@@ -42,9 +41,7 @@ const Feed = () => {
     const isBottom = useOnScreen(bottomRef)
     useEffect(() => {
         // only reload feed if the newest status is older than 10 minutes
-        const lastStatus = feed.reduce((prev, current) => (prev.createdAt > current.createdAt) ? prev : current, { createdAt: "1970-01-01T00:00:00.000Z" })
-        console.log("last status", lastStatus)
-        if (lastStatus && (Date.now() - (new Date(lastStatus.createdAt)).getTime()) > 1800 * 1000) {
+        if (checkFresh()) {
             setRecords(20)
             constructFeed()
             setLoading(false)
@@ -61,6 +58,12 @@ const Feed = () => {
             loadMore()
         }
     }, [isBottom])
+
+    const checkFresh = () => {
+        // only reload feed if the newest status is older than 10 minutes
+        const lastStatus = feed.reduce((prev, current) => (prev.createdAt > current.createdAt) ? prev : current, { createdAt: "1970-01-01T00:00:00.000Z" })
+        return (Date.now() - (new Date(lastStatus.createdAt)).getTime()) > 1800 * 1000
+    }
 
     const restoreFeedCache = async () => {
         if (user) {
@@ -80,17 +83,13 @@ const Feed = () => {
 
     const constructFeed = async () => {
         if (user) {
-            let currUser: mastodon.v1.Account
-            try {
-                currUser = await api.v1.accounts.verifyCredentials();
-            } catch (error) {
-                console.log(error)
+            const currUser: mastodon.v1.Account = await api.v1.accounts.verifyCredentials().catch((error) => {
+                console.error(error)
                 logout()
-            }
+                return null
+            })
             const algo = new TheAlgorithm(api, currUser)
-
             const feed: StatusType[] = await algo.getFeed()
-
             setWeights(await algo.getWeights())
             setFeed(feed)
             setAlgo(algo)
@@ -98,32 +97,25 @@ const Feed = () => {
     };
 
     const loadMore = () => {
-        if (records < feed.length) {
-            console.log("load more")
-            console.log(records)
-            setRecords(records + 10)
-        }
+        if (records < feed.length) setRecords(records + 10)
     }
 
     //Adjust Weights
     const weightAdjust = async (scores: weightsType) => {
         const newWeights = await algoObj.weightAdjust(scores)
-        console.log(newWeights)
         setWeights(newWeights)
     }
 
     const updateWeights = async (newWeights: weightsType) => {
         setWeights(newWeights)
-        if (algoObj) {
-            const newFeed = await algoObj.setWeights(newWeights)
-            setFeed(newFeed)
-        }
+        algoObj?.setWeights(newWeights)
+            .then((newFeed) => setFeed(newFeed))
+            .catch((error) => setError(error))
     }
 
     const updateSettings = async (newSettings: settingsType) => {
-        console.log(newSettings)
         setSettings(newSettings)
-        setFeed([...feed])
+        setFeed([...feed]) //force rerender
     }
 
 
@@ -167,6 +159,8 @@ const Feed = () => {
                         status={status}
                         api={api}
                         user={user}
+                        weights={weights}
+                        setWeights={setWeights}
                         weightAdjust={weightAdjust}
                         key={status.uri}
                         setError={setError}
