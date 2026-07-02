@@ -16,7 +16,7 @@ export default function LoginPage() {
         const api = await createRestAPIClient({
             url: `https://${sanitized_server}`,
         });
-        const scope = "read write:favourites write:statuses write:follows"
+        const scope = "read write:favourites write:statuses write:follows write:accounts"
         const redirectUri = window.location.origin + "/callback"
         const app = await api.v1.apps.create({
             clientName: "ForYouFeed",
