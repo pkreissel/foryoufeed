@@ -1,0 +1,36 @@
+name: Deploy to BunnyCDN
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy to BunnyCDN
+        uses: ayeressian/bunnycdn-storage-deploy@v2.4.6
+        with:
+          source: "dist"
+          destination: "/"
+          storageZoneName: "${{ secrets.BUNNY_STORAGE_ZONE_NAME }}"
+          storagePassword: "${{ secrets.BUNNY_STORAGE_PASSWORD }}"
+          pullZoneId: "${{ secrets.BUNNY_PULL_ZONE_ID }}"
+          accessKey: "${{ secrets.BUNNY_API_KEY }}"
+          purgePullZone: true
