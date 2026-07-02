@@ -7,7 +7,7 @@ import { usePersistentState } from "react-persistent-state"
 import { useLocalStorage, AppStorage } from "../hooks/useLocalStorage";
 
 export default function LoginPage() {
-    const [server, setServer] = usePersistentState<string>("", "server");
+    const [server, setServer] = usePersistentState<string>("", { storageKey: "server" });
 
     const [_app, setApp] = useLocalStorage({ keyName: "app", defaultValue: {} } as AppStorage)
 
